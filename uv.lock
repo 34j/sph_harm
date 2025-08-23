@@ -99,6 +99,21 @@ wheels = [
 ]
 
 [[package]]
+name = "array-api-negative-index"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "array-api-compat", version = "1.11.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
+    { name = "array-api-compat", version = "1.12.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "types-array-api", version = "1.1.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "types-array-api", version = "1.1.5", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f0/6e/926483a974e51161513aa08b2b10065e773fb5e95fa88343dd34792efa3b/array_api_negative_index-0.1.0.tar.gz", hash = "sha256:3ca0549eb8906fe4ace57f79d74c7d546e1f64f7818d1c5b07047621b556867c", size = 6701, upload-time = "2025-08-21T06:30:34.008Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/da/db/cec3ac9ca7fc4c871978210d02c9bcd881eb036bd1aa41ba6de51408561a/array_api_negative_index-0.1.0-py3-none-any.whl", hash = "sha256:abdb9857936750893a179b6c8c4d2ae5d87ca8eac991cf1c029015920badb4be", size = 5465, upload-time = "2025-08-21T06:30:32.83Z" },
+]
+
+[[package]]
 name = "babel"
 version = "2.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1188,6 +1203,7 @@ name = "sph-harm"
 version = "0.0.0"
 source = { editable = "." }
 dependencies = [
+    { name = "array-api-negative-index" },
     { name = "jacobi-poly" },
     { name = "rich" },
     { name = "typer" },
@@ -1207,6 +1223,7 @@ docs = [
 
 [package.metadata]
 requires-dist = [
+    { name = "array-api-negative-index", specifier = ">=0.1.0" },
     { name = "jacobi-poly", specifier = ">=0.1.0" },
     { name = "rich", specifier = ">=10" },
     { name = "typer", specifier = ">=0.15,<1" },

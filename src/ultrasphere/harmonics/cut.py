@@ -4,7 +4,7 @@ from typing import overload
 from array_api._2024_12 import Array
 
 from ..coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ._core.eigenfunction import ndim_harmonics
+from ._core._eigenfunction import ndim_harmonics
 
 
 @overload
