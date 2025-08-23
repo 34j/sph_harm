@@ -44,4 +44,9 @@ def expand_cut[TEuclidean, TSpherical](
         The cut expansion coefficients.
 
     """
-    return expansion[: int(harm_n_ndim(n_end, e_ndim=c.e_ndim))]
+    is_mapping = isinstance(expansion, Mapping)
+    if is_mapping:
+        return {
+            k: v[..., : int(harm_n_ndim(n_end, e_ndim=c.e_ndim))] for k, v in expansion.items()
+        }
+    return expansion[..., : int(harm_n_ndim(n_end, e_ndim=c.e_ndim))]
