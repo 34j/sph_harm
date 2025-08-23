@@ -2,11 +2,10 @@ import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
 
-from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ultrasphere.creation import c_spherical, standard
-from ultrasphere.polynomial import gegenbauer
+from ultrasphere import SphericalCoordinates, c_spherical, standard
+from jacobi_poly import gegenbauer_all
 from ultrasphere.special import sjv
-from ultrasphere.wave_expansion import plane_wave_expansion_coef
+from ultrasphere.harmonics.wave_expansion import plane_wave_expansion_coef
 
 
 @pytest.mark.parametrize(
@@ -17,7 +16,7 @@ from ultrasphere.wave_expansion import plane_wave_expansion_coef
     ],
 )
 @pytest.mark.parametrize("n_end", [30])
-def test_plane_wave_decomposition(
+def test_plane_wave_decomposition[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     xp: ArrayNamespaceFull,
@@ -37,7 +36,7 @@ def test_plane_wave_decomposition(
             k[..., None] * r[..., None],
         )
         # * legendre(xp.cos(gamma), ndim=c.e_ndim, n_end=n_end)
-        * gegenbauer(xp.cos(gamma), alpha=xp.asarray((c.e_ndim - 2) / 2), n_end=n_end),
+        * gegenbauer_all(xp.cos(gamma), alpha=xp.asarray((c.e_ndim - 2) / 2), n_end=n_end),
         axis=-1,
     )
     assert xp.all(xpx.isclose(actual, expected, rtol=1e-3, atol=1e-3))

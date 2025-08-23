@@ -9,7 +9,7 @@ from ultrasphere import (
     SphericalCoordinates,
 )
 from ._core._assume import (
-    get_n_end_and_include_negative_m_from_expansion,
+    assume_n_end_and_include_negative_m_from_harmonics
 )
 from ultrasphere import integrate
 
