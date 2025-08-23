@@ -4,8 +4,7 @@ from typing import overload
 from array_api._2024_12 import Array
 
 from ultrasphere import SphericalCoordinates
-from ._core._eigenfunction import ndim_harmonics
-
+from ._ndim import harm_n_ndim
 
 @overload
 def expand_cut[TEuclidean, TSpherical](
@@ -45,4 +44,4 @@ def expand_cut[TEuclidean, TSpherical](
         The cut expansion coefficients.
 
     """
-    return expansion[: ndim_harmonics
+    return expansion[: int(harm_n_ndim(n_end, e_ndim=c.e_ndim))]

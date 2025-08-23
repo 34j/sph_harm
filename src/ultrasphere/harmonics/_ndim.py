@@ -1,14 +1,16 @@
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 
+from jacobi_poly import binom
 
-def homogeneous_ndim(n: int | Array, *, e_ndim: int | Array) -> int | Array:
+
+def homogeneous_ndim(n_end: int | Array, *, e_ndim: int | Array) -> int | Array:
     """
-    The dimension of the homogeneous polynomials of degree n.
+    The dimension of the homogeneous polynomials of degree below n_end.
 
     Parameters
     ----------
-    n : int | Array
+    n_end : int | Array
         The degree.
     e_ndim : int | Array
         The dimension of the Euclidean space.
@@ -25,16 +27,17 @@ def homogeneous_ndim(n: int | Array, *, e_ndim: int | Array) -> int | Array:
 
     """
     s_ndim = e_ndim - 1
+    n = n_end - 1
     return binom(n + s_ndim, s_ndim)
 
 
-def harm_n_ndim(n: int | Array, *, e_ndim: int | Array) -> int | Array:
+def harm_n_ndim(n_end: int | Array, *, e_ndim: int | Array) -> int | Array:
     """
-    The dimension of the spherical harmonics of degree n.
+    The dimension of the spherical harmonics of degree below n_end.
 
     Parameters
     ----------
-    n : int | Array
+    n_end : int | Array
         The degree.
     e_ndim : int | Array
         The dimension of the Euclidean space.
@@ -51,6 +54,7 @@ def harm_n_ndim(n: int | Array, *, e_ndim: int | Array) -> int | Array:
 
     """
     xp = array_namespace(n, e_ndim)
+    n = n_end - 1
     if e_ndim == 1:
         return xp.where(n <= 1, 1, 0)
     elif e_ndim == 2:
