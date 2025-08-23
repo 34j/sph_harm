@@ -1,6 +1,7 @@
 import numpy as np
 import numpy as xp
 import pytest
+
 from ultrasphere.harmonics.eigenfunction import type_b, type_bdash, type_c
 
 

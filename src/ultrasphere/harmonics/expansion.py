@@ -4,6 +4,7 @@ from typing import Any, Literal, overload
 import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
+
 from ultrasphere.coordinates import (
     SphericalCoordinates,
     TEuclidean,

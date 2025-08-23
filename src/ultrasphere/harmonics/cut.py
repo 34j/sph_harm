@@ -2,11 +2,9 @@ from collections.abc import Mapping
 from typing import overload
 
 from array_api._2024_12 import Array
-from array_api_compat import array_namespace
-from ._core.eigenfunction import ndim_harmonics
 
-from ..coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical
-from .assume import get_n_end_and_include_negative_m_from_expansion
+from ..coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ._core.eigenfunction import ndim_harmonics
 
 
 @overload
@@ -47,4 +45,4 @@ def expand_cut(
         The cut expansion coefficients.
 
     """
-    return expansion[:ndim_harmonics(n_end)]
+    return expansion[: ndim_harmonics(n_end)]

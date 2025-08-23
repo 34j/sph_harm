@@ -3,6 +3,7 @@ from typing import Literal
 
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
+
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.harmonics.expansion import (
     expand,

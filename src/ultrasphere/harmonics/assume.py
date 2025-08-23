@@ -34,5 +34,3 @@ def get_n_end_and_include_negative_m_from_expansion(
     n_end = (max(sizes) + 1) // 2
     include_negative_m = not all(size == n_end for size in sizes)
     return n_end, include_negative_m
-
-

@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from matplotlib import pyplot as plt
+
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.creation import (
     c_spherical,

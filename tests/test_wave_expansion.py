@@ -1,6 +1,7 @@
 import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
+
 from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
 from ultrasphere.creation import c_spherical, standard
 from ultrasphere.polynomial import gegenbauer
