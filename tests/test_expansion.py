@@ -17,13 +17,13 @@ from ultrasphere.creation import (
     standard,
 )
 from ultrasphere.harmonics._core._eigenfunction import ndim_harmonics
-from ultrasphere.harmonics.cut import expand_cut
-from ultrasphere.harmonics.expansion import expand, expand_evaluate
 from ultrasphere.harmonics._core._flatten import (
     flatten_harmonics,
     flatten_mask_harmonics,
     unflatten_harmonics,
 )
+from ultrasphere.harmonics.cut import expand_cut
+from ultrasphere.harmonics.expansion import expand, expand_evaluate
 from ultrasphere.harmonics.harmonics import harmonics
 from ultrasphere.harmonics.harmonics import harmonics as harmonics_
 from ultrasphere.harmonics.helmholtz import harmonics_regular_singular

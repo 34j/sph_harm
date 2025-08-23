@@ -10,12 +10,12 @@ from ultrasphere import (
     TSpherical,
     get_child,
 )
+
 from ._concat import concat_harmonics
-from ._expand_dim import expand_dims_harmonics
-
 from ._eigenfunction import type_a, type_b, type_bdash, type_c
-
+from ._expand_dim import expand_dims_harmonics
 from ._flatten import flatten_harmonics
+
 
 def _harmonics(
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -108,6 +108,7 @@ def _harmonics(
         else:
             raise ValueError(f"Invalid branching type {c.branching_types[node]}.")
     return result
+
 
 @overload
 def harmonics(
@@ -204,16 +205,18 @@ def harmonics(
     Array
         The spherical harmonics.
 
-    """    
+    """
     if flatten is None:
-        flatten = concat    
+        flatten = concat
     if index_with_surrogate_quantum_number and expand_dims:
-        raise ValueError("expand_dims must be False if index_with_surrogate_quantum_number is True.")
+        raise ValueError(
+            "expand_dims must be False if index_with_surrogate_quantum_number is True."
+        )
     if concat and not expand_dims:
         raise ValueError("expand_dims must be True if concat is True.")
     if flatten and not expand_dims:
         raise ValueError("expand_dims must be True if flatten is True.")
-    
+
     result = _harmonics(
         c,
         spherical,
