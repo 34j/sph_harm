@@ -5,16 +5,13 @@ import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 
-from ultrasphere.coordinates import (
+from ultrasphere import (
     SphericalCoordinates,
-    TEuclidean,
-    TSpherical,
 )
-from ultrasphere.harmonics._core._eigenfunction import ndim_harmonics
-from ultrasphere.harmonics.assume import (
+from .assume import (
     get_n_end_and_include_negative_m_from_expansion,
 )
-from ultrasphere.integral import integrate
+from ultrasphere import integrate
 
 from ._core._eigenfunction import ndim_harmonics as ndim_harmonics_
 from ._core._harmonics import harmonics as harmonics_
@@ -22,7 +19,7 @@ from ._core._harmonics import harmonics as harmonics__
 
 
 @overload
-def expand_evaluate(
+def expand_evaluate[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     expansion: Mapping[TSpherical, Array],
     spherical: Mapping[TSpherical, Array],
@@ -32,7 +29,7 @@ def expand_evaluate(
 
 
 @overload
-def expand_evaluate(
+def expand_evaluate[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     expansion: Array,
     spherical: Mapping[TSpherical, Array],
@@ -41,7 +38,7 @@ def expand_evaluate(
 ) -> Array: ...
 
 
-def expand_evaluate(
+def expand_evaluate[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     expansion: Mapping[TSpherical, Array] | Array,
     spherical: Mapping[TSpherical, Array],
@@ -143,7 +140,7 @@ def expand_evaluate(
 
 
 @overload
-def expand(
+def expand[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     f: (
         Callable[
@@ -165,7 +162,7 @@ def expand(
 
 
 @overload
-def expand(
+def expand[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     f: (
         Callable[
@@ -186,7 +183,7 @@ def expand(
 ) -> Array: ...
 
 
-def expand(
+def expand[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     f: (
         Callable[

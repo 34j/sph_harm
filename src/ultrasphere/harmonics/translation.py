@@ -4,18 +4,18 @@ from typing import Literal
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 
-from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ultrasphere.harmonics.expansion import (
+from ultrasphere import SphericalCoordinates
+from .expansion import (
     expand,
 )
-from ultrasphere.harmonics._core._flatten import index_array_harmonics
+from ._core._flatten import index_array_harmonics
 from ultrasphere.harmonics.harmonics import concat_harmonics, expand_dims_harmonics
-from ultrasphere.harmonics.helmholtz import harmonics_regular_singular
+from .helmholtz import harmonics_regular_singular
 
 from ._core._harmonics import harmonics as harmonics_
 
 
-def harmonics_translation_coef(
+def harmonics_translation_coef[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     euclidean: Mapping[TEuclidean, Array],
     *,
@@ -120,7 +120,7 @@ def harmonics_translation_coef(
     )
 
 
-def harmonics_twins_expansion(
+def harmonics_twins_expansion[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end_1: int,
@@ -303,7 +303,7 @@ def harmonics_twins_expansion(
     )
 
 
-def harmonics_translation_coef_using_triplet(
+def harmonics_translation_coef_using_triplet[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: Mapping[TSpherical | Literal["r"], Array],
     *,

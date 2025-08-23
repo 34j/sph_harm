@@ -1,9 +1,10 @@
 from collections.abc import Mapping
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
+from ultrasphere import SphericalCoordinates
 
 
-def _expand_dim_harmoncis(
+def _expand_dim_harmoncis[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     node: TSpherical,
     harmonics: Array,
@@ -68,7 +69,7 @@ def _expand_dim_harmoncis(
     return xp.moveaxis(harmonics, list(moveaxis.keys()), list(moveaxis.values()))
 
 
-def expand_dims_harmonics(
+def expand_dims_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Mapping[TSpherical, Array],
 ) -> Mapping[TSpherical, Array]:

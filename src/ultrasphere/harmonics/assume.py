@@ -2,10 +2,10 @@ from collections.abc import Mapping
 
 from array_api._2024_12 import Array
 
-from ..coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere import SphericalCoordinates
 
 
-def get_n_end_and_include_negative_m_from_expansion(
+def assume_n_end_and_include_negative_m_from_harmonics[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     expansion: Mapping[TSpherical, Array] | Array,
 ) -> tuple[int, bool]:

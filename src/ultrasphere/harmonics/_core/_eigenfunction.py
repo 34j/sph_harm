@@ -22,8 +22,9 @@ from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 from shift_nth_row_n_steps import shift_nth_row_n_steps
 
-from ..polynomial import jacobi, jacobi_normalization_constant
-from ..symmetry import to_symmetric
+from jacobi_poly import jacobi_all, jacobi_normalization_constant
+from array_api_negative_index import to_symmetric
+from ultrasphere import SphericalCoordinates
 
 
 def type_a(
@@ -142,7 +143,7 @@ def type_b(
             alpha=alpha[..., None], beta=alpha[..., None], n=n, xp=xp
         )
         * (xp.sin(theta[..., None, None]) ** l_beta[..., None])
-        * jacobi(n_end=n_end, alpha=alpha, beta=alpha, x=xp.cos(theta[..., None]))
+        * jacobi_all(n_end=n_end, alpha=alpha, beta=alpha, x=xp.cos(theta[..., None]))
     )
     if not index_with_surrogate_quantum_number:
         # [l_beta, n] -> [l_beta, l = n + l_beta]
@@ -211,7 +212,7 @@ def type_bdash(
             alpha=beta[..., None], beta=beta[..., None], n=n, xp=xp
         )
         * (xp.cos(theta[..., None, None]) ** l_alpha[..., None])
-        * jacobi(n_end=n_end, alpha=beta, beta=beta, x=xp.sin(theta[..., None]))
+        * jacobi_all(n_end=n_end, alpha=beta, beta=beta, x=xp.sin(theta[..., None]))
     )
     if not index_with_surrogate_quantum_number:
         res = shift_nth_row_n_steps(
@@ -294,7 +295,7 @@ def type_c(
         )
         * (xp.sin(theta[..., None, None, None]) ** l_beta[..., None])
         * (xp.cos(theta[..., None, None, None]) ** l_alpha[..., None])
-        * jacobi(
+        * jacobi_all(
             n_end=(n_end + 1) // 2,
             alpha=beta,
             beta=alpha,  # this is weird but correct
@@ -336,7 +337,7 @@ def type_c(
     return res
 
 
-def ndim_harmonics(
+def ndim_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     node: TSpherical,
 ) -> int:

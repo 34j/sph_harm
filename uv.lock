@@ -171,6 +171,15 @@ wheels = [
 ]
 
 [[package]]
+name = "cm-time"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/fb/db/aef662a01ec5b855f1fa1ca969f5cf6489a2e7c83f38704426bdf8c6c1d9/cm_time-0.1.2.tar.gz", hash = "sha256:e2848efc5868884d0a7795408ec9b2c21d2d3e2cf399241e8e4531a29128b638", size = 7757, upload-time = "2023-03-15T21:45:13.543Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/53/5f/28ac6460fc9c67d4751200fffe56006c465663f7a1672793c6d8482b21e5/cm_time-0.1.2-py3-none-any.whl", hash = "sha256:8dfd172916a7b23f508fbca046157067ab9374fc38791d408278ce7288077cfa", size = 7811, upload-time = "2023-03-15T21:45:12.436Z" },
+]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1082,6 +1091,23 @@ wheels = [
 ]
 
 [[package]]
+name = "shift-nth-row-n-steps"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "array-api-compat" },
+    { name = "cm-time" },
+    { name = "rich" },
+    { name = "typer" },
+    { name = "types-array-api" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/42/b0/d0d8fc306b044408413a2a1e192c5d557f3352cc16bf4df8e7274528d64c/shift_nth_row_n_steps-1.0.0.tar.gz", hash = "sha256:16f2a7ea004eefe66775e037ef1cda51ecee359b67349d7c9ff67b9832fbe62a", size = 12735, upload-time = "2025-06-30T12:46:40.685Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f3/6f/e529f70216bc4d6ecba9b679f485b67653153d61f32cfac2275dea0aee99/shift_nth_row_n_steps-1.0.0-py3-none-any.whl", hash = "sha256:9db27ad13808ba11ab1df6b9037d36b87d9ccad657b7f98f6cc595484239f1f0", size = 9554, upload-time = "2025-06-30T12:46:38.992Z" },
+]
+
+[[package]]
 name = "six"
 version = "1.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1125,6 +1151,7 @@ dependencies = [
     { name = "array-api-negative-index" },
     { name = "jacobi-poly" },
     { name = "rich" },
+    { name = "shift-nth-row-n-steps" },
     { name = "typer" },
     { name = "ultrasphere" },
 ]
@@ -1146,6 +1173,7 @@ requires-dist = [
     { name = "array-api-negative-index", specifier = ">=0.1.0" },
     { name = "jacobi-poly", specifier = ">=0.1.0" },
     { name = "rich", specifier = ">=10" },
+    { name = "shift-nth-row-n-steps", specifier = ">=1.0.0" },
     { name = "typer", specifier = ">=0.15,<1" },
     { name = "ultrasphere", specifier = ">=1.1.2" },
 ]

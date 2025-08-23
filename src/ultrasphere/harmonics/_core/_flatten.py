@@ -6,18 +6,16 @@ from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 from shift_nth_row_n_steps._torch_like import create_slice
 
-from ultrasphere.coordinates import (
+from ultrasphere import (
     BranchingType,
     SphericalCoordinates,
-    TEuclidean,
-    TSpherical,
     get_child,
 )
-from ultrasphere.harmonics.assume import get_n_end_and_include_negative_m_from_expansion
-from ultrasphere.symmetry import to_symmetric
+from ..assume import assume_n_end_and_include_negative_m_from_harmonics
+from array_api_negative_index import to_symmetric
 
 
-def index_array_harmonics(
+def index_array_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     node: TSpherical,
     *,
@@ -246,7 +244,7 @@ def flatten_harmonics(
 
     """
     xp = array_namespace(harmonics)
-    n_end, include_negative_m = get_n_end_and_include_negative_m_from_expansion(
+    n_end, include_negative_m = assume_n_end_and_include_negative_m_from_harmonics(
         c, harmonics
     )
     mask = flatten_mask_harmonics(c, n_end, xp, include_negative_m)

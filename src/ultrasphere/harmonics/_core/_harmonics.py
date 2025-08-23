@@ -4,12 +4,9 @@ from typing import Literal, overload
 from array_api._2024_12 import Array
 
 from ultrasphere import (
-    BranchingType,
-    SphericalCoordinates,
-    TEuclidean,
-    TSpherical,
-    get_child,
+    SphericalCoordinates, get_child, BranchingType
 )
+from ultrasphere._coordinates import TSpherical, TEuclidean
 from ._concat import concat_harmonics
 from ._expand_dim import expand_dims_harmonics
 

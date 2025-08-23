@@ -3,12 +3,12 @@ from typing import overload
 
 from array_api._2024_12 import Array
 
-from ..coordinates import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere import SphericalCoordinates
 from ._core._eigenfunction import ndim_harmonics
 
 
 @overload
-def expand_cut(
+def expand_cut[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     expansion: Mapping[TSpherical, Array],
     n_end: int,
@@ -16,14 +16,14 @@ def expand_cut(
 
 
 @overload
-def expand_cut(
+def expand_cut[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     expansion: Array,
     n_end: int,
 ) -> Array: ...
 
 
-def expand_cut(
+def expand_cut[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     expansion: Mapping[TSpherical, Array] | Array,
     n_end: int,

@@ -4,8 +4,10 @@ from array_api_compat import array_namespace
 
 from collections.abc import Mapping
 
+from ultrasphere import SphericalCoordinates
 
-def concat_harmonics(
+
+def concat_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Mapping[TSpherical, Array],
 ) -> Array:

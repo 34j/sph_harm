@@ -29,6 +29,7 @@ dependencies = [
   "array-api-negative-index>=0.1.0",
   "jacobi-poly>=0.1.0",
   "rich>=10",
+  "shift-nth-row-n-steps>=1.0.0",
   "typer>=0.15,<1",
   "ultrasphere>=1.1.2",
 ]
