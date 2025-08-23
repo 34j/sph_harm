@@ -5,12 +5,12 @@ from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 
 from ultrasphere import SphericalCoordinates
-from .expansion import (
+from ._expansion import (
     expand,
 )
 from ._core._flatten import index_array_harmonics
 from ultrasphere.harmonics.harmonics import concat_harmonics, expand_dims_harmonics
-from .helmholtz import harmonics_regular_singular
+from ._helmholtz import harmonics_regular_singular
 
 from ._core._harmonics import harmonics as harmonics_
 

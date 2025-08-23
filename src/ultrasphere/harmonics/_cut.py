@@ -45,4 +45,4 @@ def expand_cut[TEuclidean, TSpherical](
         The cut expansion coefficients.
 
     """
-    return expansion[: ndim_harmonics(n_end)]
+    return expansion[: ndim_harmonics
