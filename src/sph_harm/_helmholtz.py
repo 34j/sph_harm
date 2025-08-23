@@ -5,14 +5,14 @@ from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 from shift_nth_row_n_steps._torch_like import create_slice
 
-from ultrasphere import SphericalCoordinates, TEuclidean, TSpherical
+from ultrasphere import SphericalCoordinates
 from ._core._assume import assume_n_end_and_include_negative_m_from_harmonics
 from ._core._flatten import index_array_harmonics
 from ultrasphere.special import szv
 
 
 @overload
-def harmonics_regular_singular(
+def harmonics_regular_singular[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
         Mapping[TSpherical | Literal["r"], Array] | Mapping[Literal["r"], Array]
@@ -27,7 +27,7 @@ def harmonics_regular_singular(
 
 
 @overload
-def harmonics_regular_singular(
+def harmonics_regular_singular[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
         Mapping[TSpherical | Literal["r"], Array] | Mapping[Literal["r"], Array]
@@ -41,7 +41,7 @@ def harmonics_regular_singular(
 ) -> Array: ...
 
 
-def harmonics_regular_singular(
+def harmonics_regular_singular[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
         Mapping[TSpherical | Literal["r"], Array] | Mapping[Literal["r"], Array]

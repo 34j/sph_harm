@@ -16,18 +16,18 @@ from ultrasphere.creation import (
     random,
     standard,
 )
-from ultrasphere.harmonics._core._eigenfunction import ndim_harmonics
-from ultrasphere.harmonics.cut import expand_cut
-from ultrasphere.harmonics.expansion import expand, expand_evaluate
-from ultrasphere.harmonics._core._flatten import (
+from sph_harm._core._eigenfunction import ndim_harmonics
+from sph_harm.cut import expand_cut
+from sph_harm.expansion import expand, expand_evaluate
+from sph_harm._core._flatten import (
     flatten_harmonics,
     flatten_mask_harmonics,
     unflatten_harmonics,
 )
-from ultrasphere.harmonics.harmonics import harmonics
-from ultrasphere.harmonics.harmonics import harmonics as harmonics_
-from ultrasphere.harmonics.helmholtz import harmonics_regular_singular
-from ultrasphere.harmonics.translation import (
+from sph_harm.harmonics import harmonics
+from sph_harm.harmonics import harmonics as harmonics_
+from sph_harm.helmholtz import harmonics_regular_singular
+from sph_harm.translation import (
     harmonics_translation_coef,
     harmonics_translation_coef_using_triplet,
     harmonics_twins_expansion,

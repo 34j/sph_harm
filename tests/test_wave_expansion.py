@@ -5,7 +5,7 @@ from array_api._2024_12 import ArrayNamespaceFull
 from ultrasphere import SphericalCoordinates, c_spherical, standard
 from jacobi_poly import gegenbauer_all
 from ultrasphere.special import sjv
-from ultrasphere.harmonics.wave_expansion import plane_wave_expansion_coef
+from sph_harm.wave_expansion import plane_wave_expansion_coef
 
 
 @pytest.mark.parametrize(

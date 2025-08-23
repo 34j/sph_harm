@@ -9,7 +9,7 @@ from ._expansion import (
     expand,
 )
 from ._core._flatten import index_array_harmonics
-from ultrasphere.harmonics.harmonics import concat_harmonics, expand_dims_harmonics
+from ._core import concat_harmonics, expand_dims_harmonics
 from ._helmholtz import harmonics_regular_singular
 
 from ._core._harmonics import harmonics as harmonics_

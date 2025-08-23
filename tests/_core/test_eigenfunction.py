@@ -2,7 +2,7 @@ import numpy as np
 import numpy as xp
 import pytest
 
-from ultrasphere.harmonics._core._eigenfunction import type_b, type_bdash, type_c
+from sph_harm._core._eigenfunction import type_b, type_bdash, type_c
 
 
 def type_b_scalar(theta: float, s_beta: float, l_beta: int, l: int) -> float:

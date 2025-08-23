@@ -8,14 +8,13 @@ from array_api_compat import array_namespace
 from ultrasphere import (
     SphericalCoordinates,
 )
-from ._core._assume import (
+from ._core import (
     assume_n_end_and_include_negative_m_from_harmonics
 )
 from ultrasphere import integrate
 
 from ._core._eigenfunction import ndim_harmonics as ndim_harmonics_
-from ._core._harmonics import harmonics as harmonics_
-from ._core._harmonics import harmonics as harmonics__
+from ._core import harmonics as harmonics__
 
 
 @overload
@@ -82,7 +81,7 @@ def expand_evaluate[TEuclidean, TSpherical](
         if is_mapping
         else array_namespace(expansion)
     )
-    n_end, _ = get_n_end_and_include_negative_m_from_expansion(c, expansion)
+    n_end, _ = assume_n_end_and_include_negative_m_from_harmonics(c, expansion)
     harmonics = harmonics__(
         c,  # type: ignore
         spherical,
@@ -292,7 +291,7 @@ def expand[TEuclidean, TSpherical](
             val = f
 
         # calculate harmonics
-        harmonics = harmonics_(
+        harmonics = harmonics__(
             c,  # type: ignore
             xs,
             n_end,
@@ -318,7 +317,7 @@ def expand[TEuclidean, TSpherical](
                 # result: theta(node),u1,...,uM,harm1,...,harmN
                 xpx.broadcast_shapes(value.shape[:1], harmonics[node].shape[:1])
                 ndim_val = value.ndim - 1
-                ndim_harm = ndim_harmonics(c, node)
+                ndim_harm = ndim_harmonics_(c, node)
                 value = value[(...,) + (None,) * (ndim_harm)]
                 harm = harmonics[node][
                     (slice(None),) + (None,) * ndim_val + (slice(None),) * ndim_harm

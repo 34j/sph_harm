@@ -2,7 +2,7 @@ import numpy as np
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 
-from .special import lgamma
+from jacobi_poly import lgamma
 
 
 def plane_wave_expansion_coef(n: int | Array, *, e_ndim: int | Array) -> Array:
