@@ -26,8 +26,11 @@ classifiers = [
 ]
 
 dependencies = [
+  "array-api-negative-index>=0.1.0",
+  "jacobi-poly>=0.1.0",
   "rich>=10",
   "typer>=0.15,<1",
+  "ultrasphere>=1.0.0",
 ]
 urls."Bug Tracker" = "https://github.com/34j/sph_harm/issues"
 urls.Changelog = "https://github.com/34j/sph_harm/blob/main/CHANGELOG.md"
