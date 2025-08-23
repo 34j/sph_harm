@@ -334,3 +334,30 @@ def type_c(
     if is_beta_type_a_and_include_negative_m:
         res = to_symmetric(res, axis=-2, asymmetric=False, conjugate=False)
     return res
+
+
+def ndim_harmonics(
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    node: TSpherical,
+) -> int:
+    """
+    The number of dimensions of the eigenfunction
+    corresponding to the node.
+
+    Parameters
+    ----------
+    node : TSpherical
+        The node of the spherical coordinates.
+
+    Returns
+    -------
+    int
+        The number of dimensions.
+
+    """
+    return {
+        BranchingType.A: 1,
+        BranchingType.B: 2,
+        BranchingType.BP: 2,
+        BranchingType.C: 3,
+    }[c.branching_types[node]]

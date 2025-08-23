@@ -15,7 +15,7 @@ from ultrasphere.creation import (
     random,
     standard,
 )
-from ultrasphere.harmonics.assume import ndim_harmonics
+from ultrasphere.harmonics._core.eigenfunction import ndim_harmonics
 from ultrasphere.harmonics.cut import expand_cut
 from ultrasphere.harmonics.expansion import expand, expand_evaluate
 from ultrasphere.harmonics.flatten import (

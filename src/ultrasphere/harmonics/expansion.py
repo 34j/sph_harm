@@ -9,13 +9,13 @@ from ultrasphere.coordinates import (
     TEuclidean,
     TSpherical,
 )
+from ultrasphere.harmonics._core.eigenfunction import ndim_harmonics
 from ultrasphere.harmonics.assume import (
     get_n_end_and_include_negative_m_from_expansion,
-    ndim_harmonics,
 )
 from ultrasphere.integral import integrate
 
-from .assume import ndim_harmonics as ndim_harmonics_
+from ._core.eigenfunction import ndim_harmonics as ndim_harmonics_
 from ._core.harmonics import harmonics as harmonics_
 from ._core.harmonics import harmonics as harmonics__
 

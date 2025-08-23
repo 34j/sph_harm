@@ -3,9 +3,10 @@ from typing import overload
 
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
+from ._core.eigenfunction import ndim_harmonics
 
 from ..coordinates import BranchingType, SphericalCoordinates, TEuclidean, TSpherical
-from .assume import get_n_end_and_include_negative_m_from_expansion, ndim_harmonics
+from .assume import get_n_end_and_include_negative_m_from_expansion
 
 
 @overload
