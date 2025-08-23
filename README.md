@@ -62,18 +62,18 @@ $$
 
 spaces of homogeneous polynomials, harmonic polynomials, and spherical harmonics, respectively.
 
-We are interested to compute orthonormal basis of $H_n (\mathbb{S}^{d-1})$ which coressponds to one of spherical coordinates. This can be expressed as product of eigenfunctions $\psi_\Theta$
+We are interested to compute orthonormal basis of $H_n (\mathbb{S}^{d-1})$ which coressponds to one of spherical coordinates. Any element $Y^l$ in such basis can be expressed as product of eigenfunctions $\psi^l_\Theta$ with different quantum numbers $l$:
 
 $$
-Y(\theta) = \prod_{\Theta \in \text{Nodes}} \psi_\Theta (\theta_{\Theta})
+Y^l(\theta) = \prod_{\Theta \in \text{Nodes}} \psi^l_\Theta (\theta_{\Theta})
 $$
 
-Each $\psi_\Theta$ only depends to 1,2 or 3 quantum number depnding on the type of $\Theta$. 
+Each $\psi^l_\Theta$ only depends to 1,2 or 3 quantum number depnding on the type of $\Theta$.
 
 To compute $Y$, this package do the following:
 
 1. Compute all $\psi_\Theta$ and put them to a `Mapping[TSpherical, Array]`, where the dimension of each array is minimal (1, 2, or 3)
-2. Expand and reorder the dimension of each array to $d-1$, so that they are broadcastable
+2. Expand the dimension of each array to $d-1$ and reorder them, so that they are broadcastable
 3. Multiply all arrays
 4. Remove disallowed combinations of quantum numbers
 
