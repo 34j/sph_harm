@@ -1,6 +1,6 @@
 from typer.testing import CliRunner
 
-from sph_harm.cli import app
+from ultrasphere.cli import app
 
 runner = CliRunner()
 

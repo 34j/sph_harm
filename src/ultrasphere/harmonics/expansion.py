@@ -16,8 +16,8 @@ from ultrasphere.harmonics.assume import (
 from ultrasphere.integral import integrate
 
 from .assume import ndim_harmonics as ndim_harmonics_
-from .harmonics import harmonics as harmonics_
-from .harmonics import harmonics as harmonics__
+from ._core.harmonics import harmonics as harmonics_
+from ._core.harmonics import harmonics as harmonics__
 
 
 @overload
