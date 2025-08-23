@@ -6,7 +6,7 @@ from array_api_compat import array_namespace
 from shift_nth_row_n_steps._torch_like import create_slice
 
 from ultrasphere import SphericalCoordinates, TEuclidean, TSpherical
-from .assume import assume_n_end_and_include_negative_m_from_harmonics
+from ._core._assume import assume_n_end_and_include_negative_m_from_harmonics
 from ._core._flatten import index_array_harmonics
 from ultrasphere.special import szv
 

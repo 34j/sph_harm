@@ -11,7 +11,7 @@ from ultrasphere import (
     SphericalCoordinates,
     get_child,
 )
-from ..assume import assume_n_end_and_include_negative_m_from_harmonics
+from ._assume import assume_n_end_and_include_negative_m_from_harmonics
 from array_api_negative_index import to_symmetric
 
 

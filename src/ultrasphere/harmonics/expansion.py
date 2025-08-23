@@ -8,7 +8,7 @@ from array_api_compat import array_namespace
 from ultrasphere import (
     SphericalCoordinates,
 )
-from .assume import (
+from ._core._assume import (
     get_n_end_and_include_negative_m_from_expansion,
 )
 from ultrasphere import integrate
