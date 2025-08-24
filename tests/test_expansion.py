@@ -66,12 +66,13 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
     if not concat:
         for key, value in actual.items():
             # assert quantum numbers are the same for non-zero values
-            expansion_nonzero = (xp.abs(value) > 1e-3).nonzero(as_tuple=False)
+            expansion_nonzero = xp.stack(xp.nonzero(xp.abs(value) > 1e-3), axis=-1)
+            assert expansion_nonzero.shape[1] == ndim_harmonics(c, key) * 2
             l, r = (
                 expansion_nonzero[:, : ndim_harmonics(c, key)],
                 expansion_nonzero[:, ndim_harmonics(c, key) :],
             )
-            idx = (l[:-1, :] == r[:-1, :]).all(axis=-1).nonzero(as_tuple=False)
+            idx = xp.stack(xp.nonzero((l[:-1, :] == r[:-1, :]).all(axis=-1)), axis=-1).squeeze()
             assert xp.all(l[idx, :] == r[idx, :])
     else:
         expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)))
