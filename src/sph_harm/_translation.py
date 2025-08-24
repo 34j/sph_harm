@@ -3,15 +3,16 @@ from typing import Literal
 
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
-from ultrasphere import SphericalCoordinates
+from ultrasphere import SphericalCoordinates, get_child
 
 from ._core import concat_harmonics, expand_dims_harmonics
 from ._core._flatten import _index_array_harmonics
-from ._core._harmonics import harmonics as harmonics_
+from ._core._harmonics import harmonics
 from ._expansion import (
     expand,
 )
-from ._helmholtz import harmonics_regular_singular_component
+from ._helmholtz import harmonics_regular_singular_component, harmonics_regular_singular
+from gumerov_expansion_coefficients import translational_coefficients
 
 
 def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
@@ -67,7 +68,7 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
     def to_expand(spherical: Mapping[TSpherical, Array]) -> Array:
         # returns [spherical1,...,sphericalN,user1,...,userM,n1,...,nN]
         # [spherical1,...,sphericalN,n1,...,nN]
-        harmonics = harmonics_(
+        Y = harmonics(
             c,
             spherical,
             n_end,
@@ -96,7 +97,7 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
         # [spherical1,...,sphericalN,user1,...,userM]
         e = xp.exp(1j * k[(None,) * ndim_spherical + (slice(None),) * ndim_user] * ip)
         result = (
-            harmonics[
+            Y[
                 (slice(None),) * ndim_spherical
                 + (None,) * ndim_user
                 + (slice(None),) * ndim_spherical
@@ -174,10 +175,10 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
     def to_expand(spherical: Mapping[TSpherical, Array]) -> Array:
         # returns [theta,n1,...,nN,nsummed1,...,nsummedN]
         # Y(n)Y*(nsummed)
-        Y1 = harmonics_(
+        Y1 = harmonics(
             c,
             spherical,
-            n_end_1,
+            n_end=n_end_1,
             condon_shortley_phase=condon_shortley_phase,
             expand_dims=True,
             concat=False,
@@ -188,10 +189,10 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
         }
         if conj_1:
             Y1 = {k: xp.conj(v) for k, v in Y1.items()}
-        Y2 = harmonics_(
+        Y2 = harmonics(
             c,
             spherical,
-            n_end_2,
+            n_end=n_end_2,
             condon_shortley_phase=condon_shortley_phase,
             expand_dims=True,
             concat=False,
@@ -284,18 +285,13 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
 
     # returns [user1,...,userM,n1,...,nN,np1,...,npN]
     coef = (2 * xp.pi) ** (c.e_ndim / 2) * xp.sqrt(2 / xp.pi)
-    t_Y = harmonics_(
-        c,  # type: ignore
+    t_RS = harmonics_regular_singular(
+        c,
         spherical,
         n_end=n_end + n_end_add - 1,
         condon_shortley_phase=condon_shortley_phase,
         expand_dims=True,
         concat=True,
-    )
-    t_RS = harmonics_regular_singular_component(
-        c,
-        spherical,
-        harmonics=t_Y,
         k=k,
         type="regular" if is_type_same else "singular",
     )
@@ -309,14 +305,13 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
             condon_shortley_phase=condon_shortley_phase,
             conj_1=False,
             conj_2=True,
-            analytic=True,
             xp=xp,
         ),
         axis=tuple(range(-c.s_ndim, 0)),
     )
 
 
-def harmonics_translation_coef_triplet[TEuclidean, TSpherical](
+def harmonics_translation_coef[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: Mapping[TSpherical | Literal["r"], Array],
     *,
@@ -363,3 +358,32 @@ def harmonics_translation_coef_triplet[TEuclidean, TSpherical](
         which quantum number is [-2*c.s_ndim,-c.s_ndim-1] indices.
 
     """
+    if method == "gumerov":
+        if c.branching_types_expression_str == "ba":
+            return translational_coefficients(k * spherical["r"],
+                                              spherical[c.root],
+                                              spherical[get_child(c.G, c.root, "cos")],
+                                              n_end=n_end, same=is_type_same,)
+        else:
+            raise NotImplementedError()
+    elif method == "plane_wave":
+        return _harmonics_translation_coef_plane_wave(
+            c,
+            spherical,
+            n_end=n_end,
+            n_end_add=n_end_add,
+            condon_shortley_phase=condon_shortley_phase,
+            k=k,
+        )
+    elif method == "triplet" or method is None:
+        return _harmonics_translation_coef_triplet(
+            c,
+            spherical,
+            n_end=n_end,
+            n_end_add=n_end_add,
+            condon_shortley_phase=condon_shortley_phase,
+            k=k,
+            is_type_same=is_type_same,
+        )
+    else:
+        raise ValueError(f"Invalid method {method}.")

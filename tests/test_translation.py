@@ -19,82 +19,8 @@ from sph_harm._helmholtz import (
     harmonics_regular_singular,
     harmonics_regular_singular_component,
 )
+from sph_harm._translation import harmonics_translation_coef
 
-
-@pytest.mark.parametrize(
-    "c",
-    [
-        (c_spherical()),
-        (from_branching_types("a")),
-    ],
-)
-@pytest.mark.parametrize("n_end, n_end_add", [(4, 14)])
-@pytest.mark.parametrize("condon_shortley_phase", [False])
-@pytest.mark.parametrize("type", ["regular", "singular"])
-def test_harmonics_translation_coef[TSpherical, TEuclidean](
-    c: SphericalCoordinates[TSpherical, TEuclidean],
-    n_end: int,
-    n_end_add: int,
-    condon_shortley_phase: bool,
-    type: Literal["regular", "singular"],
-    xp: ArrayNamespaceFull,
-) -> None:
-    shape = (20,)
-    # get x, t, y := x + t
-    x = random_points(c, shape=shape, xp=xp)
-    t = random_points(c, shape=shape, xp=xp)
-    k = xp.random.random_uniform(low=0.8, high=1.2, shape=shape)
-    if type == "singular":
-        # |t| < |x|
-        t *= xp.random.random_uniform(low=0.05, high=0.1, shape=shape)
-        assert (
-            xp.linalg.vector_norm(t, axis=0) < xp.linalg.vector_norm(x, axis=0)
-        ).all()
-    # t = xp.zeros_like(t)
-    y = x + t
-    x_spherical = c.from_euclidean(x)
-    y_spherical = c.from_euclidean(y)
-
-    y_RS = harmonics_regular_singular(
-        c,
-        y_spherical,
-        k=k,
-        n_end=n_end,
-        condon_shortley_phase=condon_shortley_phase,
-        concat=True,
-        expand_dims=True,
-        type=type,
-    )
-    x_RS = harmonics_regular_singular(
-        c,
-        x_spherical,
-        k=k,
-        n_end=n_end_add,
-        condon_shortley_phase=condon_shortley_phase,
-        concat=True,
-        expand_dims=True,
-        type=type,
-    )
-    # expected (y)
-    expected = y_RS
-
-    # actual
-    coef = harmonics_translation_coef(
-        c,
-        t,
-        n_end=n_end,
-        n_end_add=n_end_add,
-        k=k,
-        condon_shortley_phase=condon_shortley_phase,
-    )
-    actual = xp.sum(
-        x_RS[(...,) + (None,) * c.s_ndim + (slice(None),) * c.s_ndim] * coef,
-        axis=tuple(range(-c.s_ndim, 0)),
-    )
-    if type == "regular":
-        assert xp.all(xpx.isclose(actual, expected, rtol=1e-4, atol=1e-4))
-    else:
-        pytest.skip("singular case does not converge in real world computation")
 
 
 def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> None:
@@ -115,39 +41,31 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
 
     n_end = 6
     for n_end_add in [1, 3, 5, 7, 9]:
-        y_RS = harmonics_regular_singular_component(
+        y_RS = harmonics_regular_singular(
             c,
             y_spherical,
             k=k,
-            harmonics=harmonics(
-                c,  # type: ignore
-                y_spherical,
-                n_end=n_end,
-                condon_shortley_phase=False,
-                concat=True,
-                expand_dims=True,
-            ),
+            n_end=n_end,
+            condon_shortley_phase=False,
+            concat=True,
+            expand_dims=True,
             type="singular",
         )
-        x_RS = harmonics_regular_singular_component(
+        x_RS = harmonics_regular_singular(
             c,
             x_spherical,
             k=k,
-            harmonics=harmonics(
-                c,  # type: ignore
-                x_spherical,
-                n_end=n_end_add,
-                condon_shortley_phase=False,
-                concat=True,
-                expand_dims=True,
-            ),
+            n_end=n_end_add,
+            condon_shortley_phase=False,
+            concat=True,
+            expand_dims=True,
             type="regular",
         )
         # expected (y)
         expected = y_RS
 
         # actual
-        coef = _harmonics_translation_coef_triplet(
+        coef = harmonics_translation_coef(
             c,
             t_spherical,
             n_end=n_end,
@@ -163,49 +81,6 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
         print(xp.round(expected[5, 2], decimals=6), xp.round(actual[5, 2], decimals=6))
 
 
-@pytest.mark.parametrize(
-    "c",
-    [
-        (from_branching_types("a")),
-        (c_spherical()),
-    ],
-)
-@pytest.mark.parametrize("n_end", [6])
-@pytest.mark.parametrize("condon_shortley_phase", [False])
-@pytest.mark.parametrize("conj_1", [True, False])
-@pytest.mark.parametrize("conj_2", [True, False])
-def test_harmonics_twins_expansion[TSpherical, TEuclidean](
-    c: SphericalCoordinates[TSpherical, TEuclidean],
-    condon_shortley_phase: bool,
-    n_end: int,
-    conj_1: bool,
-    conj_2: bool,
-    xp: ArrayNamespaceFull,
-) -> None:
-    actual = harmonics_twins_expansion(
-        c,
-        n_end_1=n_end,
-        n_end_2=n_end,
-        condon_shortley_phase=condon_shortley_phase,
-        conj_1=conj_1,
-        conj_2=conj_2,
-        analytic=False,
-        xp=xp,
-    )
-    expected = harmonics_twins_expansion(
-        c,
-        n_end_1=n_end,
-        n_end_2=n_end,
-        condon_shortley_phase=condon_shortley_phase,
-        conj_1=conj_1,
-        conj_2=conj_2,
-        analytic=True,
-        xp=xp,
-    )
-    # unmatched = ~xp.isclose(actual, expected, atol=1e-5, rtol=1e-5)
-    # print(unmatched.nonzero(as_tuple=False), actual[unmatched], expected[unmatched])
-    assert xp.all(xpx.isclose(actual, expected, rtol=1e-5, atol=1e-5))
-
 
 @pytest.mark.parametrize(
     "c",
@@ -220,7 +95,7 @@ def test_harmonics_twins_expansion[TSpherical, TEuclidean](
     "from_,to_",
     [("regular", "regular"), ("singular", "singular"), ("regular", "singular")],
 )
-def test_harmonics_translation_coef_using_triplet[TSpherical, TEuclidean](
+def test_harmonics_translation_coef[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     n_end_add: int,
@@ -253,39 +128,31 @@ def test_harmonics_translation_coef_using_triplet[TSpherical, TEuclidean](
     x_spherical = c.from_euclidean(x)
     y_spherical = c.from_euclidean(y)
 
-    y_RS = harmonics_regular_singular_component(
+    y_RS = harmonics_regular_singular(
         c,
         y_spherical,
         k=k,
-        harmonics=harmonics(
-            c,  # type: ignore
-            y_spherical,
-            n_end=n_end,
-            condon_shortley_phase=condon_shortley_phase,
-            concat=True,
-            expand_dims=True,
-        ),
+        n_end=n_end,
+        condon_shortley_phase=condon_shortley_phase,
+        concat=True,
+        expand_dims=True,
         type=to_,
     )
-    x_RS = harmonics_regular_singular_component(
+    x_RS = harmonics_regular_singular(
         c,
         x_spherical,
         k=k,
-        harmonics=harmonics(
-            c,  # type: ignore
-            x_spherical,
-            n_end=n_end_add,
-            condon_shortley_phase=condon_shortley_phase,
-            concat=True,
-            expand_dims=True,
-        ),
+        n_end=n_end_add,
+        condon_shortley_phase=condon_shortley_phase,
+        concat=True,
+        expand_dims=True,
         type=from_,
     )
     # expected (y)
     expected = y_RS
 
     # actual
-    coef = _harmonics_translation_coef_triplet(
+    coef = harmonics_translation_coef(
         c,
         t_spherical,
         n_end=n_end,
@@ -294,35 +161,6 @@ def test_harmonics_translation_coef_using_triplet[TSpherical, TEuclidean](
         condon_shortley_phase=condon_shortley_phase,
         is_type_same=from_ == to_,
     )
-    if c.e_ndim == 2:
-        n = to_symmetric(xp.arange(n_end), asymmetric=True)
-        n_add = to_symmetric(xp.arange(n_end_add), asymmetric=True)
-        idx = n[:, None] - n_add[None, :]
-        expected2 = (
-            2
-            * harmonics_regular_singular_component(
-                c,
-                t_spherical,
-                k=k,
-                harmonics=harmonics(
-                    c,  # type: ignore
-                    t_spherical,
-                    n_end=n_end + n_end_add - 1,
-                    condon_shortley_phase=condon_shortley_phase,
-                    concat=True,
-                    expand_dims=True,
-                ),
-                type="regular" if from_ == to_ else "singular",
-            )[..., idx]
-        )
-        assert xp.all(
-            xpx.isclose(
-                coef,
-                expected2,
-                rtol=1e-5,
-                atol=1e-5,
-            )
-        )
     actual = xp.sum(
         x_RS[(...,) + (None,) * c.s_ndim + (slice(None),) * c.s_ndim] * coef,
         axis=tuple(range(-c.s_ndim, 0)),
