@@ -136,9 +136,11 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
     spherical: (
         Mapping[TSpherical | Literal["r"], Array] | Mapping[Literal["r"], Array]
     ),
+    /,
     *,
     n_end: int,
     k: Array,
+    condon_shortley_phase: bool = False,
     type: Literal["regular", "singular", "j", "y", "h1", "h2"],
     derivative: bool = False,
     expand_dims: bool = True,
@@ -153,9 +155,11 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
     spherical: (
         Mapping[TSpherical | Literal["r"], Array] | Mapping[Literal["r"], Array]
     ),
+    /,
     *,
     n_end: int,
     k: Array,
+    condon_shortley_phase: bool = False,
     type: Literal["regular", "singular", "j", "y", "h1", "h2"],
     derivative: bool = False,
     expand_dims: bool = True,

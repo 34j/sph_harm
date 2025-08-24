@@ -16,108 +16,9 @@ from ultrasphere.special import szv
 
 from sph_harm._core import harmonics
 from sph_harm._helmholtz import (
+    harmonics_regular_singular,
     harmonics_regular_singular_component,
 )
-
-
-@pytest.mark.skip(reason="test_translation_coef covers this")
-@pytest.mark.parametrize(
-    "c",
-    [
-        (c_spherical()),
-        (standard(3)),
-        (hopf(2)),
-    ],
-)
-@pytest.mark.parametrize("n_end", [5])
-@pytest.mark.parametrize(
-    "concat, expand_dims", [(True, True), (False, False), (False, True)]
-)
-@pytest.mark.parametrize("type", ["j"])  # , "y", "h1", "h2"])
-def test_harmonics_regular_singular_j_expansion[TSpherical, TEuclidean](
-    c: SphericalCoordinates[TSpherical, TEuclidean],
-    n_end: int,
-    concat: bool,
-    expand_dims: bool,
-    type: Literal["j", "y", "h1", "h2"],
-    xp: ArrayNamespaceFull,
-) -> None:
-    shape = (5,)
-    x = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
-    y = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
-    k = xp.random.random_uniform(low=0, high=1, shape=shape)
-
-    x_spherical = c.from_euclidean(x)
-    y_spherical = c.from_euclidean(y)
-
-    expected = szv(0, c.e_ndim, k * xp.linalg.vector_norm(x - y, axis=0), type=type)
-    x_Y = harmonics(
-        c,
-        x_spherical,
-        n_end=n_end,
-        condon_shortley_phase=False,
-        concat=concat,
-        expand_dims=expand_dims,
-    )
-    x_Z = (
-        harmonics_regular_singular_component(
-            c,
-            x_spherical,
-            k=k,
-            type=type,
-            concat=concat,
-            expand_dims=expand_dims,
-            n_end=n_end,
-        )
-        * x_Y
-    )
-    x_R = (
-        harmonics_regular_singular_component(
-            c,
-            x_spherical,
-            k=k,
-            type="regular",
-            concat=concat,
-            expand_dims=expand_dims,
-            n_end=n_end,
-        )
-        * x_Y
-    )
-    y_Y = harmonics(
-        c,
-        y_spherical,
-        n_end=n_end,
-        condon_shortley_phase=False,
-        concat=concat,
-        expand_dims=expand_dims,
-    )
-    y_Z = harmonics_regular_singular_component(
-        c,
-        y_spherical,
-        k=k,
-        type=type,
-        concat=concat,
-        expand_dims=expand_dims,
-        n_end=n_end,
-    )
-    y_R = harmonics_regular_singular_component(
-        c,
-        y_spherical,
-        k=k,
-        type="regular",
-        concat=concat,
-        expand_dims=expand_dims,
-        n_end=n_end,
-    )
-    if concat:
-        coef = 2 * (2 * xp.pi) ** ((c.e_ndim - 1) / 2)
-        # smaller one (in terms of l2 norm) -> j, larger one -> z
-        actual = coef * xp.where(
-            x_spherical["r"] < y_spherical["r"],
-            xp.sum(x_R * y_Z * y_Y.conj(), axis=tuple(range(-c.s_ndim, 0))),
-            xp.sum(x_Z * y_R * y_Y.conj(), axis=tuple(range(-c.s_ndim, 0))),
-        )
-        assert xp.all(xpx.isclose(actual, xp.real(expected), rtol=1e-3, atol=1e-3))
 
 
 @pytest.mark.parametrize(
@@ -154,32 +55,24 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
     x_spherical = c.from_euclidean(x)
     y_spherical = c.from_euclidean(y)
 
-    y_RS = harmonics_regular_singular_component(
+    y_RS = harmonics_regular_singular(
         c,
         y_spherical,
         k=k,
-        harmonics=harmonics(
-            c,  # type: ignore
-            y_spherical,
-            n_end=n_end,
-            condon_shortley_phase=condon_shortley_phase,
-            concat=True,
-            expand_dims=True,
-        ),
+        n_end=n_end,
+        condon_shortley_phase=condon_shortley_phase,
+        concat=True,
+        expand_dims=True,
         type=type,
     )
-    x_RS = harmonics_regular_singular_component(
+    x_RS = harmonics_regular_singular(
         c,
         x_spherical,
         k=k,
-        harmonics=harmonics(
-            c,  # type: ignore
-            x_spherical,
-            n_end=n_end_add,
-            condon_shortley_phase=condon_shortley_phase,
-            concat=True,
-            expand_dims=True,
-        ),
+        n_end=n_end_add,
+        condon_shortley_phase=condon_shortley_phase,
+        concat=True,
+        expand_dims=True,
         type=type,
     )
     # expected (y)
