@@ -19,6 +19,7 @@ from sph_harm._core import harmonics
 from sph_harm._core._eigenfunction import ndim_harmonics
 from sph_harm._cut import expand_cut
 from sph_harm._expansion import expand, expand_evaluate
+from sph_harm._ndim import harm_n_ndim_le
 
 PATH = Path("tests/.cache/")
 Path.mkdir(PATH, exist_ok=True)
@@ -33,33 +34,34 @@ Path.mkdir(PATH, exist_ok=True)
         (hopf(2)),
     ],
 )
-@pytest.mark.parametrize("n", [3, 4])
+@pytest.mark.parametrize("n_end", [3, 4])
 @pytest.mark.parametrize("condon_shortley_phase", [True, False])
 @pytest.mark.parametrize("concat", [True, False])
 def test_orthogonal_expand[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
-    n: int,
+    n_end: int,
     condon_shortley_phase: bool,
     concat: bool,
     xp: ArrayNamespaceFull,
 ) -> None:
-    def f(s: Mapping[TSpherical, Array]) -> Array:
+    def f(spherical: Mapping[TSpherical, Array]) -> Array:
         return harmonics(
-            c,  # type: ignore
-            s,
-            n_end=n,
+            c, 
+            spherical,
+            n_end=n_end,
             condon_shortley_phase=condon_shortley_phase,
             concat=concat,
             expand_dims=concat,
         )
 
     actual = expand(
-        c,  # type: ignore
+        c,
         f,
-        n=n,
-        n_end=n,
+        n=n_end,
+        n_end=n_end,
         does_f_support_separation_of_variables=not concat,
         condon_shortley_phase=condon_shortley_phase,
+        xp=xp
     )
     if not concat:
         for key, value in actual.items():
@@ -71,24 +73,10 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
             )
             idx = (l[:-1, :] == r[:-1, :]).all(axis=-1).nonzero(as_tuple=False)
             assert xp.all(l[idx, :] == r[idx, :])
-
-            # assert non-zero values are all 1
     else:
-        # assert quantum numbers are the same for non-zero values
-        expansion_nonzero = (xp.abs(actual) > 1e-3).nonzero(as_tuple=False)
-        l, r = expansion_nonzero[:, : c.s_ndim], expansion_nonzero[:, c.s_ndim :]
-        assert xp.all(l == r), expansion_nonzero
-
-        # assert non-zero values are all 1
-        expansion_nonzero_values = actual[xp.abs(actual) > 1e-3]
-        assert xp.all(
-            xpx.isclose(
-                expansion_nonzero_values,
-                xp.ones_like(expansion_nonzero_values),
-                rtol=1e-3,
-                atol=1e-3,
-            )
-        )
+        expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)))
+        assert xp.all(xpx.isclose(actual, expected))
+        
 
 
 @pytest.mark.parametrize(

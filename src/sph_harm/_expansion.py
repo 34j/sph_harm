@@ -168,9 +168,9 @@ def expand[TEuclidean, TSpherical](
 
         # calculate harmonics
         harmonics = harmonics__(
-            c,  # type: ignore
+            c,  
             xs,
-            n_end,
+            n_end=n_end,
             condon_shortley_phase=condon_shortley_phase,
             expand_dims=not does_f_support_separation_of_variables,
             concat=not does_f_support_separation_of_variables,
