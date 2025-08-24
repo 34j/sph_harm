@@ -108,6 +108,10 @@ def harmonics_regular_singular_component[TEuclidean, TSpherical](
     """
     if flatten is None:
         flatten = concat
+    if concat and not expand_dims:
+        raise ValueError("expand_dims must be True if concat is True.")
+    if flatten and not expand_dims:
+        raise ValueError("expand_dims must be True if flatten is True.")
     xp = array_namespace(k, *[spherical[k] for k in c.s_nodes])
     extra_dims = spherical["r"].ndim
     n = _index_array_harmonics(
@@ -124,7 +128,8 @@ def harmonics_regular_singular_component[TEuclidean, TSpherical](
     val = szv(n, c.e_ndim, kr, type=type, derivative=derivative)
     # val = xp.nan_to_num(val, nan=0)
     if flatten:
-        val = flatten_harmonics(c, val, nodes=[c.root])
+        print(val.shape)
+        val = flatten_harmonics(c, val, nodes=[c.root], n_end=n_end, include_negative_m=True)
     if not concat:
         return {"r": val}
     return val

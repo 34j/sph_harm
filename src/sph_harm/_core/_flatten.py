@@ -180,7 +180,6 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
     n_end: int,
     xp: ArrayNamespaceFull,
     include_negative_m: bool = True,
-    nodes: Iterable[TSpherical] | None = None,
 ) -> Array:
     """
     Create a mask representing the
@@ -211,15 +210,8 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
         expand_dims=True,
         xp=xp,
     )
-    if nodes is not None:
-        index_arrays = {node: v for node, v in index_arrays.items() if node in nodes}
-    shape = xpx.broadcast_shapes(
-        *[index_array.shape for index_array in index_arrays.values()]
-    )
-    mask = xp.ones(shape, dtype=bool)
+    mask = xp.ones((1,) * c.s_ndim, dtype=bool)
     for node, branching_type in c.branching_types.items():
-        if nodes is not None and node not in nodes:
-            continue
         if branching_type == BranchingType.B:
             mask = mask & (
                 xp.abs(index_arrays[get_child(c.G, node, "sin")]) <= index_arrays[node]
@@ -242,6 +234,8 @@ def flatten_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Array,
     nodes: Iterable[TSpherical] | None = None,
+    n_end: int | None = None,
+    include_negative_m: bool | None = None,
 ) -> Array:
     """
     Flatten the harmonics.
@@ -261,11 +255,16 @@ def flatten_harmonics[TSpherical, TEuclidean](
 
     """
     xp = array_namespace(harmonics)
-    n_end, include_negative_m = assume_n_end_and_include_negative_m_from_harmonics(
-        c, harmonics, flatten=False
-    )
+    if n_end is None or include_negative_m is None:
+        n_end, include_negative_m = assume_n_end_and_include_negative_m_from_harmonics(
+            c, harmonics, flatten=False
+        )
     mask = flatten_mask_harmonics(
-        c, n_end=n_end, xp=xp, include_negative_m=include_negative_m, nodes=nodes
+        c, n_end=n_end, xp=xp, include_negative_m=include_negative_m
+    )
+    harmonics = xp.broadcast_to(
+        harmonics,
+        (*harmonics.shape[:-c.s_ndim], *mask.shape),
     )
     return harmonics[..., mask]
 

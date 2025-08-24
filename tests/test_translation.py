@@ -161,9 +161,9 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         condon_shortley_phase=condon_shortley_phase,
         is_type_same=from_ == to_,
     )
-    actual = xp.sum(
-        x_RS[(...,) + (None,) * c.s_ndim + (slice(None),) * c.s_ndim] * coef,
-        axis=tuple(range(-c.s_ndim, 0)),
+    actual = xp.vecdot(
+        x_RS[..., None, :], coef,
+        axis=-1,
     )
     wrong_idx = xp.abs(actual - expected) > 1e-3
     if wrong_idx.any():
