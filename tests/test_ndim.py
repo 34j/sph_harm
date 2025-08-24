@@ -1,5 +1,6 @@
 from sph_harm._ndim import harm_n_ndim_le
 
+
 def test_harm_n_ndim_le() -> None:
     assert harm_n_ndim_le(0, e_ndim=1) == 0
     assert harm_n_ndim_le(1, e_ndim=1) == 1

@@ -82,7 +82,7 @@ def type_a(
         )
         * m
         * theta[..., None]
-    ) / xp.sqrt(2 * xp.pi)
+    ) / xp.sqrt(xp.asarray(2 * xp.pi))
     if condon_shortley_phase:
         res *= (-1) ** ((m + xp.abs(m)) // 2)
     return res

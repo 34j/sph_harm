@@ -43,6 +43,7 @@ scripts.sph_harm = "sph_harm.cli:app"
 dev = [
   "pytest>=8,<9",
   "pytest-cov>=6,<7",
+  "torch>=2.8.0",
 ]
 docs = [
   "furo>=2023.5.20; python_version>='3.11'",

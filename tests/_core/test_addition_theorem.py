@@ -4,9 +4,11 @@ import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
 from jacobi_poly import gegenbauer_all as gegenbauer
+from jacobi_poly import legendre_all as legendre
 from ultrasphere import SphericalCoordinates, c_spherical, standard
 
 from sph_harm._core import harmonics
+from sph_harm._ndim import harm_n_ndim_eq
 
 
 @pytest.mark.parametrize(
@@ -34,7 +36,9 @@ def test_addition_theorem_same_x[TSpherical, TEuclidean](
     x_spherical = c.from_euclidean(x)
     n = xp.arange(n_end)[(None,) * len(shape) + (slice(None),)]
     expected = (
-        c.harm_n_ndim(n) / c.surface_area() * xp.ones_like(x_spherical["r"])[:, None]
+        harm_n_ndim_eq(n, e_ndim=c.e_ndim)
+        / c.surface_area()
+        * xp.ones_like(x_spherical["r"])[:, None]
     )
     x_Y = harmonics(
         c,  # type: ignore
@@ -43,6 +47,7 @@ def test_addition_theorem_same_x[TSpherical, TEuclidean](
         condon_shortley_phase=False,
         concat=True,
         expand_dims=True,
+        flatten=False,
     )
     axis = set(range(0, c.s_ndim)) - {c.s_nodes.index(c.root)}
     actual = xp.sum(
@@ -95,7 +100,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
                 ndim=xp.asarray(d),
                 n_end=n_end,
             )
-            * c.harm_n_ndim(n)
+            * harm_n_ndim_eq(n, e_ndim=c.e_ndim)
             / c.surface_area()
         )
     elif type == "gegenbauer":
@@ -103,7 +108,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
         expected = (
             gegenbauer(ip_normalized, alpha=alpha, n_end=n_end)
             / gegenbauer(xp.ones_like(ip_normalized), alpha=alpha, n_end=n_end)
-            * c.harm_n_ndim(n)
+            * harm_n_ndim_eq(n, e_ndim=c.e_ndim)
             / c.surface_area()
         )
     elif type == "gegenbauer-cohl":
@@ -124,6 +129,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
         condon_shortley_phase=False,
         concat=True,
         expand_dims=True,
+        flatten=False,
     )
     y_Y = harmonics(
         c,  # type: ignore
@@ -132,6 +138,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
         condon_shortley_phase=False,
         concat=True,
         expand_dims=True,
+        flatten=False,
     )
     # [..., n]
     axis = set(range(0, c.s_ndim)) - {c.s_nodes.index(c.root)}

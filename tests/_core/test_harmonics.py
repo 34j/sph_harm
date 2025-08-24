@@ -6,7 +6,7 @@ from array_api._2024_12 import Array, ArrayNamespaceFull
 from ultrasphere import SphericalCoordinates, c_spherical, hopf, integrate, standard
 
 from sph_harm._core import harmonics
-from sph_harm._ndim import harm_n_ndim
+from sph_harm._ndim import harm_n_ndim_le
 
 
 @pytest.mark.parametrize(
@@ -25,7 +25,7 @@ def test_harmonics_orthogonal[TSpherical, TEuclidean](
     condon_shortley_phase: bool,
     xp: ArrayNamespaceFull,
 ) -> None:
-    expected = xp.eye(int(harm_n_ndim(n_end, e_ndim=c.e_ndim)))
+    expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)))
 
     def f(s: Mapping[TSpherical, Array]) -> Array:
         Y = harmonics(
