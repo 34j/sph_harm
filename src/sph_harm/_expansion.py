@@ -198,7 +198,7 @@ def expand[TEuclidean, TSpherical](
                 harm = harmonics[node][
                     (slice(None),) + (None,) * ndim_val + (slice(None),) * ndim_harm
                 ]
-                result[node] = value * harm.conj()
+                result[node] = value * xp.conj(harm)
         else:
             if does_f_support_separation_of_variables:
                 raise ValueError(
@@ -303,7 +303,7 @@ def expand_evaluate[TEuclidean, TSpherical](
         condon_shortley_phase=condon_shortley_phase,
         expand_dims=not is_mapping,
         concat=not is_mapping,
-        flatten=True,
+        flatten=not is_mapping,
     )
     if is_mapping:
         result: dict[TSpherical, Array] = {}
@@ -345,5 +345,6 @@ def expand_evaluate[TEuclidean, TSpherical](
         + (None,) * ndim_expansion
         + (slice(None),)
     ]
+    print(harmonics.shape, expansion.shape)
     result = xp.vecdot(harmonics, expansion, axis=-1)
     return result

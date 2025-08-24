@@ -20,6 +20,7 @@ from sph_harm._core._eigenfunction import ndim_harmonics
 from sph_harm._cut import expand_cut
 from sph_harm._expansion import expand, expand_evaluate
 from sph_harm._ndim import harm_n_ndim_le
+from array_api_compat import is_torch_namespace
 
 PATH = Path("tests/.cache/")
 Path.mkdir(PATH, exist_ok=True)
@@ -62,22 +63,26 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
         does_f_support_separation_of_variables=not concat,
         condon_shortley_phase=condon_shortley_phase,
         xp=xp,
+        dtype=xp.float32,
+        device=None,
     )
     if not concat:
+        if is_torch_namespace(xp):
+            pytest.skip("torch.nonzero is not array API compatible")
         for key, value in actual.items():
             # assert quantum numbers are the same for non-zero values
-            expansion_nonzero = xp.stack(xp.nonzero(xp.abs(value) > 1e-3), axis=-1)
+            expansion_nonzero = xp.moveaxis(xp.asarray(xp.nonzero(xp.abs(value) > 1e-3)), 0, 1)
             assert expansion_nonzero.shape[1] == ndim_harmonics(c, key) * 2
             l, r = (
                 expansion_nonzero[:, : ndim_harmonics(c, key)],
                 expansion_nonzero[:, ndim_harmonics(c, key) :],
             )
-            idx = xp.stack(
-                xp.nonzero((l[:-1, :] == r[:-1, :]).all(axis=-1)), axis=-1
-            ).squeeze()
+            idx = xp.squeeze(
+                xp.asarray(xp.nonzero((l[:-1, :] == r[:-1, :]).all(axis=-1))), 0
+            )
             assert xp.all(l[idx, :] == r[idx, :])
     else:
-        expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)))
+        expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)), dtype=xp.complex64)
         assert xp.all(xpx.isclose(actual, expected))
 
 
