@@ -7,7 +7,7 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
     """Get the array namespace for the given backend."""
     backend = request.param
     if backend == "numpy":
-        import numpy as xp
+        from array_api_compat import numpy as xp
 
         rng = xp.random.default_rng()
 
@@ -20,7 +20,7 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
         xp.random.random_uniform = random_uniform
         xp.random.integers = integers
     elif backend == "torch":
-        import torch as xp
+        from array_api_compat import torch as xp
 
         def random_uniform(low=0, high=1, shape=None, dtype=None):
             return xp.rand(shape, dtype=dtype) * (high - low) + low
@@ -30,6 +30,10 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
 
         xp.random.random_uniform = random_uniform
         xp.random.integers = integers
+        import torch
+
+        if torch.cuda.is_available():
+            xp.set_default_device("cuda")
     else:
         raise ValueError(f"Unknown backend: {backend}")
     return xp

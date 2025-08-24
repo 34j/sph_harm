@@ -111,7 +111,7 @@ def test_approximate[TSpherical, TEuclidean](
     def f(s: Mapping[TSpherical, Array]) -> Array:
         x = c.to_euclidean(s, as_array=True)
         # return xp.ones_like(x[0])
-        return xp.exp(1j * xp.einsum("v,v...->...", k.astype(x.dtype), x))
+        return xp.exp(1j * xp.einsum("v,v...->...", xp.astype(k, x.dtype), x))
 
     # spherical, _ = roots(c, 1, expand_dims_x=True, xp=xp)
     spherical = c.from_euclidean(random_ball(c, shape=(2, 3, 4), xp=xp, surface=True))
