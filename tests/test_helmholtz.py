@@ -15,12 +15,7 @@ from ultrasphere import random_ball as random_points
 from ultrasphere.special import szv
 
 from sph_harm._core import harmonics
-from sph_harm._helmholtz import harmonics_regular_singular_component
-from sph_harm._translation import (
-    harmonics_translation_coef,
-    _harmonics_translation_coef_triplet,
-    harmonics_twins_expansion,
-)
+from sph_harm._helmholtz import harmonics_regular_singular, harmonics_regular_singular_component
 
 
 @pytest.mark.skip(reason="test_translation_coef covers this")
@@ -55,7 +50,7 @@ def test_harmonics_regular_singular_j_expansion[TSpherical, TEuclidean](
 
     expected = szv(0, c.e_ndim, k * xp.linalg.vector_norm(x - y, axis=0), type=type)
     x_Y = harmonics(
-        c,  # type: ignore
+        c, 
         x_spherical,
         n_end=n,
         condon_shortley_phase=False,
@@ -63,7 +58,8 @@ def test_harmonics_regular_singular_j_expansion[TSpherical, TEuclidean](
         expand_dims=expand_dims,
     )
     x_Z = harmonics_regular_singular_component(
-        c, x_spherical, k=k, harmonics=x_Y, type=type, multiply=concat
+        c, x_spherical, k=k, type=type, concat=concat, expand_dims=expand_dims
+        , condon_shortley_phase=False, n_end=n_end
     )
     x_R = harmonics_regular_singular_component(
         c,
@@ -71,7 +67,7 @@ def test_harmonics_regular_singular_j_expansion[TSpherical, TEuclidean](
         k=k,
         harmonics=x_Y,
         type="regular",
-        multiply=concat,
+        concat=concat,
     )
     y_Y = harmonics(
         c,  # type: ignore
