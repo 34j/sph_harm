@@ -1,18 +1,26 @@
-from array_api_negative_index import to_symmetric
-from sph_harm._core import harmonics
-from sph_harm._helmholtz import harmonics_regular_singular
-
+from typing import Literal
 
 import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
-from ultrasphere import SphericalCoordinates, c_spherical, from_branching_types, hopf, random_ball as random_points, standard
+from array_api_negative_index import to_symmetric
+from ultrasphere import (
+    SphericalCoordinates,
+    c_spherical,
+    from_branching_types,
+    hopf,
+    standard,
+)
+from ultrasphere import random_ball as random_points
 from ultrasphere.special import szv
 
-
-from typing import Literal
-
-from sph_harm._translation import harmonics_translation_coef, harmonics_translation_coef_using_triplet, harmonics_twins_expansion
+from sph_harm._core import harmonics
+from sph_harm._helmholtz import harmonics_regular_singular
+from sph_harm._translation import (
+    harmonics_translation_coef,
+    harmonics_translation_coef_using_triplet,
+    harmonics_twins_expansion,
+)
 
 
 @pytest.mark.skip(reason="test_translation_coef covers this")

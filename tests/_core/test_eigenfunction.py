@@ -2,6 +2,7 @@ import numpy as np
 import numpy as xp
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
+
 from sph_harm._core._eigenfunction import type_b, type_bdash, type_c
 
 

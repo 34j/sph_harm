@@ -20,11 +20,10 @@ DOI:10.3842/SIGMA.2013.042 p.17-18
 
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
-from shift_nth_row_n_steps import shift_nth_row_n_steps
-
-from jacobi_poly import jacobi_all, jacobi_normalization_constant
 from array_api_negative_index import to_symmetric
-from ultrasphere import SphericalCoordinates, BranchingType
+from jacobi_poly import jacobi_all, jacobi_normalization_constant
+from shift_nth_row_n_steps import shift_nth_row_n_steps
+from ultrasphere import BranchingType, SphericalCoordinates
 
 
 def type_a(
@@ -208,9 +207,7 @@ def type_bdash(
     )
     beta = l_alpha + s_alpha[..., None] / 2
     res = (
-        jacobi_normalization_constant(
-            alpha=beta[..., None], beta=beta[..., None], n=n
-        )
+        jacobi_normalization_constant(alpha=beta[..., None], beta=beta[..., None], n=n)
         * (xp.cos(theta[..., None, None]) ** l_alpha[..., None])
         * jacobi_all(n_end=n_end, alpha=beta, beta=beta, x=xp.sin(theta[..., None]))
     )
@@ -311,7 +308,7 @@ def type_c(
         # [l_alpha, l_beta, n] -> [l_alpha, l_beta, l = 2n + l_alpha + l_beta]
         # 1. [l_alpha, l_beta, n] -> [l_alpha, l_beta, 2n]
         # add zeros to the left for each row, i.e. [1, 2, 3] -> [1, 0, 2, 0, 3, 0]
-        res_expaneded = xp.zeros(res.shape[:-1] + (n_end,))
+        res_expaneded = xp.zeros((*res.shape[:-1], n_end))
         res_expaneded[..., ::2] = res
         # 2. [l_alpha, l_beta, 2n] -> [l_alpha, l_beta, 2n + l_alpha]
         res_expaneded = shift_nth_row_n_steps(

@@ -4,15 +4,15 @@ from typing import Literal, overload
 import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
+from array_api_negative_index import to_symmetric
 from shift_nth_row_n_steps._torch_like import create_slice
-
 from ultrasphere import (
     BranchingType,
     SphericalCoordinates,
     get_child,
 )
+
 from ._assume import assume_n_end_and_include_negative_m_from_harmonics
-from array_api_negative_index import to_symmetric
 
 
 def _index_array_harmonics[TSpherical, TEuclidean](
@@ -332,6 +332,7 @@ def index_array_harmonics[TSpherical, TEuclidean](
         return flatten_harmonics(c, index_array)
     return index_array
 
+
 @overload
 def index_array_harmonics_all[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -422,13 +423,16 @@ def index_array_harmonics_all[TSpherical, TEuclidean](
         c,
         n_end=n_end,
         include_negative_m=include_negative_m,
-        as_array=as_array,             
+        as_array=as_array,
         expand_dims=expand_dims,
         mask=mask,
         xp=xp,
     )
     if flatten:
         if as_array:
-            return flatten_harmonics(c, index_arrays) 
-        return {node: flatten_harmonics(c, index_array) for node, index_array in index_arrays.items()}  # type: ignore
-    return index_arrays 
+            return flatten_harmonics(c, index_arrays)
+        return {
+            node: flatten_harmonics(c, index_array)
+            for node, index_array in index_arrays.items()
+        }  # type: ignore
+    return index_arrays

@@ -1,12 +1,12 @@
-from jacobi_poly import gegenbauer_all as gegenbauer
 from typing import Literal
-from sph_harm._core import harmonics
-
 
 import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
+from jacobi_poly import gegenbauer_all as gegenbauer
 from ultrasphere import SphericalCoordinates, c_spherical, standard
+
+from sph_harm._core import harmonics
 
 
 @pytest.mark.parametrize(

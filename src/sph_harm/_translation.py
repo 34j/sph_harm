@@ -3,16 +3,15 @@ from typing import Literal
 
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
-
 from ultrasphere import SphericalCoordinates
+
+from ._core import concat_harmonics, expand_dims_harmonics
+from ._core._flatten import _index_array_harmonics
+from ._core._harmonics import harmonics as harmonics_
 from ._expansion import (
     expand,
 )
-from ._core._flatten import _index_array_harmonics
-from ._core import concat_harmonics, expand_dims_harmonics
 from ._helmholtz import harmonics_regular_singular
-
-from ._core._harmonics import harmonics as harmonics_
 
 
 def harmonics_translation_coef[TEuclidean, TSpherical](

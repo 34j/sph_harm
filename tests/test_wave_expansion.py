@@ -1,10 +1,10 @@
 import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
-
-from ultrasphere import SphericalCoordinates, c_spherical, standard
 from jacobi_poly import gegenbauer_all
+from ultrasphere import SphericalCoordinates, c_spherical, standard
 from ultrasphere.special import sjv
+
 from sph_harm._wave_expansion import plane_wave_expansion_coef
 
 
@@ -36,7 +36,9 @@ def test_plane_wave_decomposition[TEuclidean, TSpherical](
             k[..., None] * r[..., None],
         )
         # * legendre(xp.cos(gamma), ndim=c.e_ndim, n_end=n_end)
-        * gegenbauer_all(xp.cos(gamma), alpha=xp.asarray((c.e_ndim - 2) / 2), n_end=n_end),
+        * gegenbauer_all(
+            xp.cos(gamma), alpha=xp.asarray((c.e_ndim - 2) / 2), n_end=n_end
+        ),
         axis=-1,
     )
     assert xp.all(xpx.isclose(actual, expected, rtol=1e-3, atol=1e-3))

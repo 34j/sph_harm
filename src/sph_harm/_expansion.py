@@ -4,138 +4,14 @@ from typing import Any, Literal, overload
 import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
-
 from ultrasphere import (
     SphericalCoordinates,
+    integrate,
 )
-from ._core import (
-    assume_n_end_and_include_negative_m_from_harmonics
-)
-from ultrasphere import integrate
 
-from ._core._eigenfunction import ndim_harmonics as ndim_harmonics_
+from ._core import assume_n_end_and_include_negative_m_from_harmonics
 from ._core import harmonics as harmonics__
-
-
-@overload
-def expand_evaluate[TEuclidean, TSpherical](
-    c: SphericalCoordinates[TSpherical, TEuclidean],
-    expansion: Mapping[TSpherical, Array],
-    spherical: Mapping[TSpherical, Array],
-    *,
-    condon_shortley_phase: bool,
-) -> Mapping[TSpherical, Array]: ...
-
-
-@overload
-def expand_evaluate[TEuclidean, TSpherical](
-    c: SphericalCoordinates[TSpherical, TEuclidean],
-    expansion: Array,
-    spherical: Mapping[TSpherical, Array],
-    *,
-    condon_shortley_phase: bool,
-) -> Array: ...
-
-
-def expand_evaluate[TEuclidean, TSpherical](
-    c: SphericalCoordinates[TSpherical, TEuclidean],
-    expansion: Mapping[TSpherical, Array] | Array,
-    spherical: Mapping[TSpherical, Array],
-    *,
-    condon_shortley_phase: bool,
-) -> Array | Mapping[TSpherical, Array]:
-    """
-    Evaluate the expansion at the spherical coordinates.
-
-    Parameters
-    ----------
-    expansion : Mapping[TSpherical, Array] | Array
-        The expansion coefficients.
-        If mapping, assume that the expansion is not expanded.
-    spherical : Mapping[TSpherical, Array]
-        The spherical coordinates.
-    condon_shortley_phase : bool
-        Whether to apply the Condon-Shortley phase,
-        which just multiplies the result by (-1)^m.
-
-        It seems to be mainly used in quantum mechanics for convenience.
-
-        Note that scipy.special.sph_harm (or scipy.special.lpmv)
-        uses the Condon-Shortley phase.
-
-        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
-
-        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
-        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
-
-
-    Returns
-    -------
-    Array | Mapping[TSpherical, Array]
-        The evaluated value.
-
-    """
-    is_mapping = isinstance(expansion, Mapping)
-    xp = (
-        array_namespace(*[expansion[k] for k in c.s_nodes])
-        if is_mapping
-        else array_namespace(expansion)
-    )
-    n_end, _ = assume_n_end_and_include_negative_m_from_harmonics(c, expansion)
-    harmonics = harmonics__(
-        c,  # type: ignore
-        spherical,
-        n_end,
-        condon_shortley_phase=condon_shortley_phase,
-        expand_dims=not is_mapping,
-        concat=not is_mapping,
-    )
-    if is_mapping:
-        result: dict[TSpherical, Array] = {}
-        for node in c.s_nodes:
-            expansion_ = expansion[node]
-            harmonics_ = harmonics[node]
-            # expansion: f1,...,fL,harm1,...,harmN
-            # harmonics: u1,...,uM,harm1,...,harmN
-            # result: u1,...,uM,f1,...,fL
-            ndim_harmonics = ndim_harmonics_(c, node)
-            ndim_expansion = expansion_.ndim - ndim_harmonics
-            ndim_extra_harmonics = harmonics_.ndim - ndim_harmonics
-            expansion_ = harmonics_[
-                (None,) * (ndim_extra_harmonics)
-                + (slice(None),) * (ndim_expansion + ndim_harmonics)
-            ]
-            harmonics = harmonics_[
-                (slice(None),) * ndim_extra_harmonics
-                + (None,) * ndim_expansion
-                + (slice(None),) * ndim_harmonics
-            ]
-            result_ = harmonics_ * expansion_
-            for _ in range(ndim_harmonics):
-                result_ = xp.sum(result_, axis=-1)
-            result[node] = result
-        return result
-    if isinstance(expansion, Mapping):
-        raise AssertionError()
-    # expansion: f1,...,fL,harm1,...,harmN
-    # harmonics: u1,...,uM,harm1,...,harmN
-    # result: u1,...,uM,f1,...,fL
-    ndim_harmonics = c.s_ndim
-    ndim_expansion = expansion.ndim - ndim_harmonics
-    ndim_extra_harmonics = harmonics.ndim - ndim_harmonics
-    expansion = expansion[
-        (None,) * (ndim_extra_harmonics)
-        + (slice(None),) * (ndim_expansion + ndim_harmonics)
-    ]
-    harmonics = harmonics[
-        (slice(None),) * ndim_extra_harmonics
-        + (None,) * ndim_expansion
-        + (slice(None),) * ndim_harmonics
-    ]
-    result = harmonics * expansion
-    for _ in range(ndim_harmonics):
-        result = xp.sum(result, axis=-1)
-    return result
+from ._core._eigenfunction import ndim_harmonics as ndim_harmonics_
 
 
 @overload
@@ -313,8 +189,8 @@ def expand[TEuclidean, TSpherical](
             for node in c.s_nodes:
                 value = val[node]
                 # val: theta(node),u1,...,uM
-                # harmonics: theta(node),harm1,...,harmN
-                # result: theta(node),u1,...,uM,harm1,...,harmN
+                # harmonics: theta(node),harm1,...,harmNnode
+                # result: theta(node),u1,...,uM,harm1,...,harmNnode
                 xpx.broadcast_shapes(value.shape[:1], harmonics[node].shape[:1])
                 ndim_val = value.ndim - 1
                 ndim_harm = ndim_harmonics_(c, node)
@@ -331,15 +207,13 @@ def expand[TEuclidean, TSpherical](
                     "is True."
                 )
             # val: theta1,...,thetaN,u1,...,uM
-            # harmonics: theta1,...,thetaN,harm1,...,harmN
-            # res: theta1,...,thetaN,u1,...,uM,harm1,...,harmN
+            # harmonics: theta1,...,thetaN,harm
+            # res: theta1,...,thetaN,u1,...,uM,harm
             xpx.broadcast_shapes(val.shape[: c.s_ndim], harmonics.shape[: c.s_ndim])
             ndim_val = val.ndim - c.s_ndim
-            val = val[(slice(None),) * (c.s_ndim + ndim_val) + (None,) * c.s_ndim]
+            val = val[..., None]
             harmonics = harmonics[
-                (slice(None),) * c.s_ndim
-                + (None,) * ndim_val
-                + (slice(None),) * c.s_ndim
+                (slice(None),) * c.s_ndim + (None,) * ndim_val + (slice(None),)
             ]
             result = val * harmonics.conj()
 
@@ -354,3 +228,125 @@ def expand[TEuclidean, TSpherical](
         dtype=dtype,
         xp=xp,
     )
+
+
+@overload
+def expand_evaluate[TEuclidean, TSpherical](
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    expansion: Mapping[TSpherical, Array],
+    spherical: Mapping[TSpherical, Array],
+    *,
+    condon_shortley_phase: bool,
+) -> Mapping[TSpherical, Array]: ...
+
+
+@overload
+def expand_evaluate[TEuclidean, TSpherical](
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    expansion: Array,
+    spherical: Mapping[TSpherical, Array],
+    *,
+    condon_shortley_phase: bool,
+) -> Array: ...
+
+
+def expand_evaluate[TEuclidean, TSpherical](
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    expansion: Mapping[TSpherical, Array] | Array,
+    spherical: Mapping[TSpherical, Array],
+    *,
+    condon_shortley_phase: bool,
+) -> Array | Mapping[TSpherical, Array]:
+    """
+    Evaluate the expansion at the spherical coordinates.
+
+    Parameters
+    ----------
+    expansion : Mapping[TSpherical, Array] | Array
+        The expansion coefficients.
+        If not mapping, assume that the expansion is flatten.
+        If mapping, assume that the expansion is not expanded.
+    spherical : Mapping[TSpherical, Array]
+        The spherical coordinates.
+    condon_shortley_phase : bool
+        Whether to apply the Condon-Shortley phase,
+        which just multiplies the result by (-1)^m.
+
+        It seems to be mainly used in quantum mechanics for convenience.
+
+        Note that scipy.special.sph_harm (or scipy.special.lpmv)
+        uses the Condon-Shortley phase.
+
+        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
+
+        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
+        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+
+
+    Returns
+    -------
+    Array | Mapping[TSpherical, Array]
+        The evaluated value.
+
+    """
+    is_mapping = isinstance(expansion, Mapping)
+    xp = (
+        array_namespace(*[expansion[k] for k in c.s_nodes])
+        if is_mapping
+        else array_namespace(expansion)
+    )
+    n_end, _ = assume_n_end_and_include_negative_m_from_harmonics(c, expansion)
+    harmonics = harmonics__(
+        c,  # type: ignore
+        spherical,
+        n_end,
+        condon_shortley_phase=condon_shortley_phase,
+        expand_dims=not is_mapping,
+        concat=not is_mapping,
+    )
+    if is_mapping:
+        result: dict[TSpherical, Array] = {}
+        for node in c.s_nodes:
+            expansion_ = expansion[node]
+            harmonics_ = harmonics[node]
+            # expansion: f1,...,fL,harm1,...,harmNnode
+            # harmonics: u1,...,uM,harm1,...,harmNnode
+            # result: u1,...,uM,f1,...,fL
+            ndim_harmonics = ndim_harmonics_(c, node)
+            ndim_expansion = expansion_.ndim - ndim_harmonics
+            ndim_extra_harmonics = harmonics_.ndim - ndim_harmonics
+            expansion_ = harmonics_[
+                (None,) * (ndim_extra_harmonics)
+                + (slice(None),) * (ndim_expansion + ndim_harmonics)
+            ]
+            harmonics = harmonics_[
+                (slice(None),) * ndim_extra_harmonics
+                + (None,) * ndim_expansion
+                + (slice(None),) * ndim_harmonics
+            ]
+            result_ = harmonics_ * expansion_
+            for _ in range(ndim_harmonics):
+                result_ = xp.sum(result_, axis=-1)
+            result[node] = result
+        return result
+    if isinstance(expansion, Mapping):
+        raise AssertionError()
+    # expansion: f1,...,fL,harm1,...,harmN
+    # harmonics: u1,...,uM,harm1,...,harmN
+    # result: u1,...,uM,f1,...,fL
+    ndim_harmonics = c.s_ndim
+    ndim_expansion = expansion.ndim - ndim_harmonics
+    ndim_extra_harmonics = harmonics.ndim - ndim_harmonics
+    expansion = expansion[
+        (None,) * (ndim_extra_harmonics)
+        + (slice(None),) * (ndim_expansion + ndim_harmonics)
+    ]
+    harmonics = harmonics[
+        (slice(None),) * ndim_extra_harmonics
+        + (None,) * ndim_expansion
+        + (slice(None),) * ndim_harmonics
+    ]
+    result = harmonics * expansion
+    for _ in range(ndim_harmonics):
+        result = xp.sum(result, axis=-1)
+    return result

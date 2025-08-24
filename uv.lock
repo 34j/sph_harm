@@ -431,7 +431,7 @@ wheels = [
 
 [[package]]
 name = "jacobi-poly"
-version = "0.1.0"
+version = "1.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "array-api-compat" },
@@ -443,9 +443,9 @@ dependencies = [
     { name = "typer" },
     { name = "types-array-api" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f0/12/46567a8c8a27a383b53f3d7a689d336b8a882b0f105bb685eba78558318b/jacobi_poly-0.1.0.tar.gz", hash = "sha256:db6e04fa27ac82f601f8f3da1ef792cfdfb4d80ce593791475426bf66bf7c949", size = 12022, upload-time = "2025-08-23T02:29:23.403Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/3e/14ac2bfb9390f2ed23361b1766c1826ad556acfc6b108edcfcd92f9069d9/jacobi_poly-1.0.1.tar.gz", hash = "sha256:d0366631ee91f8a724b2bf363a532201617140e10ae72ed9fade49bbaba569a6", size = 12398, upload-time = "2025-08-24T04:31:45.741Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/72/eaf30969e6dfe2ba20f9180e8be06f3f11c15c3047ceb5a06c3dd0460bc7/jacobi_poly-0.1.0-py3-none-any.whl", hash = "sha256:cd8891bddb33f69f33993d80f23456fee2308f8400364500ff183289fd9dfa04", size = 9051, upload-time = "2025-08-23T02:29:22.007Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/4f/7c1169d5d0bf4b3c4f732bf405d687ef3bb06b93d12de1b9cdb5b4d6a91f/jacobi_poly-1.0.1-py3-none-any.whl", hash = "sha256:13d15181273f6bf446f8bf8c1962a22bdfaf7944c01830b4cbce59307b322e29", size = 9130, upload-time = "2025-08-24T04:31:44.328Z" },
 ]
 
 [[package]]
@@ -1171,7 +1171,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "array-api-negative-index", specifier = ">=0.1.0" },
-    { name = "jacobi-poly", specifier = ">=0.1.0" },
+    { name = "jacobi-poly", specifier = ">=1.0.1" },
     { name = "rich", specifier = ">=10" },
     { name = "shift-nth-row-n-steps", specifier = ">=1.0.0" },
     { name = "typer", specifier = ">=0.15,<1" },

@@ -6,19 +6,19 @@ import numpy as np
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from matplotlib import pyplot as plt
-
-from ultrasphere import SphericalCoordinates
 from ultrasphere import (
+    SphericalCoordinates,
     c_spherical,
     from_branching_types,
     hopf,
     standard,
 )
+from ultrasphere._integral import roots
+
+from sph_harm._core import harmonics
 from sph_harm._core._eigenfunction import ndim_harmonics
 from sph_harm._cut import expand_cut
 from sph_harm._expansion import expand, expand_evaluate
-from sph_harm._core import harmonics
-from ultrasphere._integral import roots
 
 PATH = Path("tests/.cache/")
 Path.mkdir(PATH, exist_ok=True)
@@ -147,5 +147,3 @@ def test_approximate[TSpherical, TEuclidean](
     ax.set_yscale("log")
     fig.savefig(PATH / f"{name}-approximate.png")
     assert error[max(error.keys())] < 2e-3
-
-

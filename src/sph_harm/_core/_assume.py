@@ -1,7 +1,6 @@
 from collections.abc import Mapping
 
 from array_api._2024_12 import Array
-
 from ultrasphere import SphericalCoordinates
 
 

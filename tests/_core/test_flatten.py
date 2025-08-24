@@ -1,12 +1,16 @@
 import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
-
-from ultrasphere import SphericalCoordinates
-from ultrasphere import c_spherical, hopf, random
+from ultrasphere import SphericalCoordinates, c_spherical, hopf, random
 from ultrasphere._integral import roots
+
 from sph_harm._core import harmonics as harmonics_
-from sph_harm._core._flatten import _index_array_harmonics_all, flatten_harmonics, flatten_mask_harmonics, unflatten_harmonics
+from sph_harm._core._flatten import (
+    _index_array_harmonics_all,
+    flatten_harmonics,
+    flatten_mask_harmonics,
+    unflatten_harmonics,
+)
 
 
 @pytest.mark.parametrize(

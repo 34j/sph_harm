@@ -2,9 +2,10 @@ from collections.abc import Mapping
 from typing import overload
 
 from array_api._2024_12 import Array
-
 from ultrasphere import SphericalCoordinates
+
 from ._ndim import harm_n_ndim
+
 
 @overload
 def expand_cut[TEuclidean, TSpherical](
@@ -47,6 +48,7 @@ def expand_cut[TEuclidean, TSpherical](
     is_mapping = isinstance(expansion, Mapping)
     if is_mapping:
         return {
-            k: v[..., : int(harm_n_ndim(n_end, e_ndim=c.e_ndim))] for k, v in expansion.items()
+            k: v[..., : int(harm_n_ndim(n_end, e_ndim=c.e_ndim))]
+            for k, v in expansion.items()
         }
     return expansion[..., : int(harm_n_ndim(n_end, e_ndim=c.e_ndim))]
