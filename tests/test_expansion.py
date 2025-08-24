@@ -8,8 +8,8 @@ import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from matplotlib import pyplot as plt
 
-from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ultrasphere.creation import (
+from ultrasphere import SphericalCoordinates
+from ultrasphere import (
     c_spherical,
     from_branching_types,
     hopf,
@@ -17,26 +17,26 @@ from ultrasphere.creation import (
     standard,
 )
 from sph_harm._core._eigenfunction import ndim_harmonics
-from sph_harm.cut import expand_cut
-from sph_harm.expansion import expand, expand_evaluate
+from sph_harm._cut import expand_cut
+from sph_harm._expansion import expand, expand_evaluate
 from sph_harm._core._flatten import (
     flatten_harmonics,
     flatten_mask_harmonics,
     unflatten_harmonics,
 )
-from sph_harm.harmonics import harmonics
-from sph_harm.harmonics import harmonics as harmonics_
-from sph_harm.helmholtz import harmonics_regular_singular
-from sph_harm.translation import (
+from sph_harm._core import harmonics
+from sph_harm._core import harmonics as harmonics_
+from sph_harm._helmholtz import harmonics_regular_singular
+from sph_harm._translation import (
     harmonics_translation_coef,
     harmonics_translation_coef_using_triplet,
     harmonics_twins_expansion,
 )
-from ultrasphere.integral import roots
-from ultrasphere.polynomial import gegenbauer, legendre
-from ultrasphere.random import random_points
+from ultrasphere._integral import roots
+from jacobi_poly import gegenbauer_all as gegenbauer, jacobi_all as jacobi
+from ultrasphere import random_ball as random_points
 from ultrasphere.special import szv
-from ultrasphere.symmetry import to_symmetric
+from array_api_negative_index import to_symmetric
 
 PATH = Path("tests/.cache/")
 Path.mkdir(PATH, exist_ok=True)
