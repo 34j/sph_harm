@@ -3,14 +3,12 @@ from typing import Literal, overload
 
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
-from shift_nth_row_n_steps._torch_like import create_slice
 from ultrasphere import SphericalCoordinates
 from ultrasphere.special import szv
 
-from ._core._assume import assume_n_end_and_include_negative_m_from_harmonics
-from ._core._flatten import _index_array_harmonics, flatten_harmonics
-from ._core._expand_dim import _expand_dim_harmoncis
 from ._core import harmonics
+from ._core._flatten import _index_array_harmonics, flatten_harmonics
+
 
 @overload
 def harmonics_regular_singular_component[TEuclidean, TSpherical](
@@ -113,9 +111,9 @@ def harmonics_regular_singular_component[TEuclidean, TSpherical](
     xp = array_namespace(k, *[spherical[k] for k in c.s_nodes])
     extra_dims = spherical["r"].ndim
     n = _index_array_harmonics(
-    c, c.root, n_end=n_end, include_negative_m=True, xp=xp, expand_dims=expand_dims
-)[(None,) * extra_dims + (slice(None),)]
-    
+        c, c.root, n_end=n_end, include_negative_m=True, xp=xp, expand_dims=expand_dims
+    )[(None,) * extra_dims + (slice(None),)]
+
     kr = k * spherical["r"]
     kr = kr[..., None]
 
@@ -130,7 +128,6 @@ def harmonics_regular_singular_component[TEuclidean, TSpherical](
     if not concat:
         return {"r": val}
     return val
-
 
 
 @overload
@@ -188,7 +185,6 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
 
     Parameters
     ----------
-
     spherical : Mapping[TSpherical | Literal['r'],
         Array] | Mapping[Literal['r'],
         Array]
@@ -260,7 +256,7 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
         n_end=n_end,
         k=k,
         type=type,
-        derivative=derivative,   
+        derivative=derivative,
         expand_dims=expand_dims,
         flatten=flatten,
         concat=concat,

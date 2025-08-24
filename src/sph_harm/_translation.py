@@ -12,7 +12,7 @@ from ._expansion import (
     expand,
 )
 from ._helmholtz import harmonics_regular_singular_component
-from gumerov_expansion_coefficients import translational_coefficients
+
 
 def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -118,6 +118,7 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
         xp=xp,
     )
 
+
 def harmonics_twins_expansion[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
@@ -169,6 +170,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
     `harmonics_twins_expansion(conj_1=True, conj_2=True)`
 
     """
+
     def to_expand(spherical: Mapping[TSpherical, Array]) -> Array:
         # returns [theta,n1,...,nN,nsummed1,...,nsummedN]
         # Y(n)Y*(nsummed)
@@ -323,7 +325,7 @@ def harmonics_translation_coef_triplet[TEuclidean, TSpherical](
     condon_shortley_phase: bool,
     k: Array,
     is_type_same: bool,
-    method: Literal["gumerov", "plane_wave", "triplet"] | None = None
+    method: Literal["gumerov", "plane_wave", "triplet"] | None = None,
 ) -> Array:
     r"""
     Translation coefficients between same or different type of elementary solutions.

@@ -15,7 +15,9 @@ from ultrasphere import random_ball as random_points
 from ultrasphere.special import szv
 
 from sph_harm._core import harmonics
-from sph_harm._helmholtz import harmonics_regular_singular, harmonics_regular_singular_component
+from sph_harm._helmholtz import (
+    harmonics_regular_singular_component,
+)
 
 
 @pytest.mark.skip(reason="test_translation_coef covers this")
@@ -27,14 +29,14 @@ from sph_harm._helmholtz import harmonics_regular_singular, harmonics_regular_si
         (hopf(2)),
     ],
 )
-@pytest.mark.parametrize("n", [5])
+@pytest.mark.parametrize("n_end", [5])
 @pytest.mark.parametrize(
     "concat, expand_dims", [(True, True), (False, False), (False, True)]
 )
 @pytest.mark.parametrize("type", ["j"])  # , "y", "h1", "h2"])
 def test_harmonics_regular_singular_j_expansion[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
-    n: int,
+    n_end: int,
     concat: bool,
     expand_dims: bool,
     type: Literal["j", "y", "h1", "h2"],
@@ -50,43 +52,62 @@ def test_harmonics_regular_singular_j_expansion[TSpherical, TEuclidean](
 
     expected = szv(0, c.e_ndim, k * xp.linalg.vector_norm(x - y, axis=0), type=type)
     x_Y = harmonics(
-        c, 
+        c,
         x_spherical,
-        n_end=n,
+        n_end=n_end,
         condon_shortley_phase=False,
         concat=concat,
         expand_dims=expand_dims,
     )
-    x_Z = harmonics_regular_singular_component(
-        c, x_spherical, k=k, type=type, concat=concat, expand_dims=expand_dims
-        , condon_shortley_phase=False, n_end=n_end
+    x_Z = (
+        harmonics_regular_singular_component(
+            c,
+            x_spherical,
+            k=k,
+            type=type,
+            concat=concat,
+            expand_dims=expand_dims,
+            n_end=n_end,
+        )
+        * x_Y
     )
-    x_R = harmonics_regular_singular_component(
-        c,
-        x_spherical,
-        k=k,
-        harmonics=x_Y,
-        type="regular",
-        concat=concat,
+    x_R = (
+        harmonics_regular_singular_component(
+            c,
+            x_spherical,
+            k=k,
+            type="regular",
+            concat=concat,
+            expand_dims=expand_dims,
+            n_end=n_end,
+        )
+        * x_Y
     )
     y_Y = harmonics(
-        c,  # type: ignore
+        c,
         y_spherical,
-        n_end=n,
+        n_end=n_end,
         condon_shortley_phase=False,
         concat=concat,
         expand_dims=expand_dims,
     )
     y_Z = harmonics_regular_singular_component(
-        c, y_spherical, k=k, harmonics=y_Y, type=type, multiply=concat
+        c,
+        y_spherical,
+        k=k,
+        type=type,
+        concat=concat,
+        expand_dims=expand_dims,
+        n_end=n_end,
     )
     y_R = harmonics_regular_singular_component(
         c,
         y_spherical,
         k=k,
-        harmonics=y_Y,
         type="regular",
-        multiply=concat,
+        concat=concat,
+        expand_dims=expand_dims,
+        n_end=n_end,
     )
     if concat:
         coef = 2 * (2 * xp.pi) ** ((c.e_ndim - 1) / 2)

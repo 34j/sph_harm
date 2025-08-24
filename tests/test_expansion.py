@@ -5,6 +5,7 @@ import array_api_extra as xpx
 import numpy as np
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api_compat import is_torch_namespace
 from matplotlib import pyplot as plt
 from ultrasphere import (
     SphericalCoordinates,
@@ -14,14 +15,12 @@ from ultrasphere import (
     random_ball,
     standard,
 )
-from ultrasphere._integral import roots
 
 from sph_harm._core import harmonics
 from sph_harm._core._eigenfunction import ndim_harmonics
 from sph_harm._cut import expand_cut
 from sph_harm._expansion import expand, expand_evaluate
 from sph_harm._ndim import harm_n_ndim_le
-from array_api_compat import is_torch_namespace
 
 PATH = Path("tests/.cache/")
 Path.mkdir(PATH, exist_ok=True)
@@ -72,7 +71,9 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
             pytest.skip("torch.nonzero is not array API compatible")
         for key, value in actual.items():
             # assert quantum numbers are the same for non-zero values
-            expansion_nonzero = xp.moveaxis(xp.asarray(xp.nonzero(xp.abs(value) > 1e-3)), 0, 1)
+            expansion_nonzero = xp.moveaxis(
+                xp.asarray(xp.nonzero(xp.abs(value) > 1e-3)), 0, 1
+            )
             assert expansion_nonzero.shape[1] == ndim_harmonics(c, key) * 2
             l, r = (
                 expansion_nonzero[:, : ndim_harmonics(c, key)],
@@ -83,7 +84,9 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
             )
             assert xp.all(l[idx, :] == r[idx, :])
     else:
-        expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)), dtype=xp.complex64)
+        expected = xp.eye(
+            int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)), dtype=xp.complex64
+        )
         assert xp.all(xpx.isclose(actual, expected, rtol=1e-6, atol=1e-6))
 
 
@@ -108,6 +111,7 @@ def test_approximate[TSpherical, TEuclidean](
     xp: ArrayNamespaceFull,
 ) -> None:
     k = xp.arange(c.e_ndim) / c.e_ndim
+
     def f(s: Mapping[TSpherical, Array]) -> Array:
         x = c.to_euclidean(s, as_array=True)
         # return xp.ones_like(x[0])

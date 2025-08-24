@@ -1,5 +1,5 @@
-from collections.abc import Mapping
-from typing import Iterable, Literal, overload
+from collections.abc import Iterable, Mapping
+from typing import Literal, overload
 
 import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
