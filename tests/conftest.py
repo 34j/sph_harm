@@ -11,8 +11,8 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
 
         rng = xp.random.default_rng()
 
-        def random_uniform(low=0, high=1, shape=None):
-            return rng.random(shape) * (high - low) + low
+        def random_uniform(low=0, high=1, shape=None, dtype=None):
+            return rng.random(shape, dtype) * (high - low) + low
 
         def integers(low, high=None, shape=None):
             return rng.integers(low, high, size=shape)
@@ -22,8 +22,8 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
     elif backend == "torch":
         import torch as xp
 
-        def random_uniform(low=0, high=1, shape=None):
-            return xp.rand(shape) * (high - low) + low
+        def random_uniform(low=0, high=1, shape=None, dtype=None):
+            return xp.rand(shape, dtype=dtype) * (high - low) + low
 
         def integers(low, high=None, shape=None):
             return xp.randint(low, high, size=shape)

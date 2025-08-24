@@ -126,7 +126,7 @@ def type_b(
     """
     xp = array_namespace(theta)
     if isinstance(s_beta, int):
-        s_beta = xp.asarray(s_beta)
+        s_beta = xp.asarray(s_beta, dtype=theta.dtype, device=theta.device)
     # using broadcasting may cause problems, we have to be very careful here
     l_beta = xp.reshape(
         xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
@@ -196,7 +196,7 @@ def type_bdash(
     """
     xp = array_namespace(theta)
     if isinstance(s_alpha, int):
-        s_alpha = xp.asarray(s_alpha)
+        s_alpha = xp.asarray(s_alpha, dtype=theta.dtype, device=theta.device)
     l_alpha = xp.reshape(
         xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [-1],
@@ -268,9 +268,9 @@ def type_c(
     """
     xp = array_namespace(theta)
     if isinstance(s_alpha, int):
-        s_alpha = xp.asarray(s_alpha)
+        s_alpha = xp.asarray(s_alpha, dtype=theta.dtype, device=theta.device)
     if isinstance(s_beta, int):
-        s_beta = xp.asarray(s_beta)
+        s_beta = xp.asarray(s_beta, dtype=theta.dtype, device=theta.device)
     l_alpha = xp.reshape(
         xp.arange(0, n_end, dtype=theta.dtype, device=theta.device),
         [1] * (theta.ndim) + [-1, 1],

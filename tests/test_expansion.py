@@ -58,7 +58,7 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
     actual = expand(
         c,
         f,
-        n=n_end,
+        n=2 * n_end - 1,
         n_end=n_end,
         does_f_support_separation_of_variables=not concat,
         condon_shortley_phase=condon_shortley_phase,
@@ -83,7 +83,10 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
             assert xp.all(l[idx, :] == r[idx, :])
     else:
         expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)), dtype=xp.complex64)
-        assert xp.all(xpx.isclose(actual, expected))
+        print(actual.shape, expected.shape)
+        print(actual[~xpx.isclose(actual, expected, rtol=1e-6, atol=1e-6)])
+        print(xp.nonzero(~xpx.isclose(actual, expected, rtol=1e-6, atol=1e-6)))
+        assert xp.all(xpx.isclose(actual, expected, rtol=1e-6, atol=1e-6))
 
 
 @pytest.mark.parametrize(

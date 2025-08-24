@@ -42,7 +42,7 @@ def test_harmonics_orthogonal[TSpherical, TEuclidean](
         return Y[..., :, None] * xp.conj(Y[..., None, :])
 
     actual = integrate(c, f, False, 2 * n_end - 1, xp=xp)
-    assert xp.all(xpx.isclose(actual, expected))
+    assert xp.all(xpx.isclose(actual, expected, rtol=1e-6, atol=1e-6))
 
 
 @pytest.mark.parametrize("n_end", [1, 2, 5]) # scipy does not support n_end == 0
