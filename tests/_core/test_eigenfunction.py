@@ -1,7 +1,7 @@
 import numpy as np
 import numpy as xp
 import pytest
-
+from array_api._2024_12 import ArrayNamespaceFull
 from sph_harm._core._eigenfunction import type_b, type_bdash, type_c
 
 
@@ -115,7 +115,7 @@ def type_c_scalar(
     return array[l_alpha, l_beta, l].item()
 
 
-def test_type_b() -> None:
+def test_type_b(xp: ArrayNamespaceFull) -> None:
     for theta in xp.random.random_uniform(low=0, high=xp.pi, shape=(3)):
         # we refer to 3d spherical harmonics table where s_beta = 0
         # https://en.wikipedia.org/wiki/Table_of_spherical_harmonics

@@ -1,7 +1,7 @@
 from collections.abc import Mapping
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
-from ultrasphere import SphericalCoordinates
+from ultrasphere import SphericalCoordinates, BranchingType, get_child
 
 
 def _expand_dim_harmoncis[TSpherical, TEuclidean](

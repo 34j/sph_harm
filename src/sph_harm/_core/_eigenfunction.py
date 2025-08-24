@@ -24,7 +24,7 @@ from shift_nth_row_n_steps import shift_nth_row_n_steps
 
 from jacobi_poly import jacobi_all, jacobi_normalization_constant
 from array_api_negative_index import to_symmetric
-from ultrasphere import SphericalCoordinates
+from ultrasphere import SphericalCoordinates, BranchingType
 
 
 def type_a(
@@ -140,7 +140,7 @@ def type_b(
     alpha = l_beta + s_beta[..., None] / 2
     res = (
         jacobi_normalization_constant(
-            alpha=alpha[..., None], beta=alpha[..., None], n=n, xp=xp
+            alpha=alpha[..., None], beta=alpha[..., None], n=n
         )
         * (xp.sin(theta[..., None, None]) ** l_beta[..., None])
         * jacobi_all(n_end=n_end, alpha=alpha, beta=alpha, x=xp.cos(theta[..., None]))
@@ -209,7 +209,7 @@ def type_bdash(
     beta = l_alpha + s_alpha[..., None] / 2
     res = (
         jacobi_normalization_constant(
-            alpha=beta[..., None], beta=beta[..., None], n=n, xp=xp
+            alpha=beta[..., None], beta=beta[..., None], n=n
         )
         * (xp.cos(theta[..., None, None]) ** l_alpha[..., None])
         * jacobi_all(n_end=n_end, alpha=beta, beta=beta, x=xp.sin(theta[..., None]))
@@ -291,7 +291,7 @@ def type_c(
     res = (
         2 ** ((alpha + beta) / 2 + 1)[..., None]
         * jacobi_normalization_constant(
-            alpha=alpha[..., None], beta=beta[..., None], n=n, xp=xp
+            alpha=alpha[..., None], beta=beta[..., None], n=n
         )
         * (xp.sin(theta[..., None, None, None]) ** l_beta[..., None])
         * (xp.cos(theta[..., None, None, None]) ** l_alpha[..., None])
