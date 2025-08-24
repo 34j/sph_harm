@@ -7,7 +7,11 @@ from gumerov_expansion_coefficients import translational_coefficients
 from ultrasphere import SphericalCoordinates, get_child
 
 from ._core import concat_harmonics, expand_dims_harmonics
-from ._core._flatten import _index_array_harmonics, index_array_harmonics
+from ._core._flatten import (
+    _index_array_harmonics,
+    flatten_harmonics,
+    index_array_harmonics,
+)
 from ._core._harmonics import harmonics
 from ._expansion import (
     expand,
@@ -201,18 +205,21 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
 
     # returns [user1,...,userM,n1,...,nN,np1,...,npN]
     return xp.real(
-        concat_harmonics(
+        flatten_harmonics(
             c,
-            expand_dims_harmonics(
+            concat_harmonics(
                 c,
-                expand(
+                expand_dims_harmonics(
                     c,
-                    to_expand,
-                    does_f_support_separation_of_variables=True,
-                    n=n_end_1 + n_end_2 - 1,  # at least n_end + 2
-                    n_end=n_end_1 + n_end_2 - 1,
-                    condon_shortley_phase=condon_shortley_phase,
-                    xp=xp,
+                    expand(
+                        c,
+                        to_expand,
+                        does_f_support_separation_of_variables=True,
+                        n=n_end_1 + n_end_2 - 1,  # at least n_end + 2
+                        n_end=n_end_1 + n_end_2 - 1,
+                        condon_shortley_phase=condon_shortley_phase,
+                        xp=xp,
+                    ),
                 ),
             ),
         )
@@ -288,7 +295,6 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
         concat=True,
         k=k,
         type="regular" if is_type_same else "singular",
-        flatten=False,
     )
     return coef * xp.sum(
         (-1j) ** (n - ns - ntemp)
@@ -302,7 +308,7 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
             conj_2=True,
             xp=xp,
         ),
-        axis=tuple(range(-c.s_ndim, 0)),
+        axis=-1,
     )
 
 
