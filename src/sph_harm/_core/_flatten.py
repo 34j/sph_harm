@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Mapping
+from collections.abc import Mapping
 from typing import Literal, overload
 
 from array_api._2024_12 import Array, ArrayNamespaceFull
@@ -232,7 +232,6 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
 def flatten_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Array,
-    nodes: Iterable[TSpherical] | None = None,
     n_end: int | None = None,
     include_negative_m: bool | None = None,
 ) -> Array:
@@ -243,9 +242,6 @@ def flatten_harmonics[TSpherical, TEuclidean](
     ----------
     harmonics : Array
         The (unflattend) harmonics.
-    nodes : Iterable[TSpherical] | None, optional
-        The nodes to consider, by default None
-        If None, all nodes are considered.
 
     Returns
     -------
@@ -349,7 +345,9 @@ def index_array_harmonics[TSpherical, TEuclidean](
         include_negative_m=include_negative_m,
     )
     if flatten:
-        return flatten_harmonics(c, index_array)
+        return flatten_harmonics(
+            c, index_array, n_end=n_end, include_negative_m=include_negative_m
+        )
     return index_array
 
 

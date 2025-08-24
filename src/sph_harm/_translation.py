@@ -183,10 +183,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
             expand_dims=True,
             concat=False,
         )
-        Y1 = {
-            k: v[(slice(None),) * 1 + (slice(None),) * c.s_ndim + (None,) * c.s_ndim]
-            for k, v in Y1.items()
-        }
+        Y1 = {k: v[..., :, None] for k, v in Y1.items()}
         if conj_1:
             Y1 = {k: xp.conj(v) for k, v in Y1.items()}
         Y2 = harmonics(
@@ -197,10 +194,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
             expand_dims=True,
             concat=False,
         )
-        Y2 = {
-            k: v[(slice(None),) * 1 + (None,) * c.s_ndim + (slice(None),) * c.s_ndim]
-            for k, v in Y2.items()
-        }
+        Y2 = {k: v[..., None, :] for k, v in Y2.items()}
         if conj_2:
             Y2 = {k: xp.conj(v) for k, v in Y2.items()}
         return {k: Y1[k] * Y2[k] for k in c.s_nodes}
@@ -273,15 +267,15 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
     """
     xp = array_namespace(*[spherical[k] for k in c.s_nodes])
     # [user1,...,userM,n1,...,nN,nsummed1,...,nsummedN,ntemp1,...,ntempN]
-    n = index_array_harmonics(c, c.root, n_end=n_end, expand_dims=True, xp=xp)[
-        (...,) + (None,) * (2 * c.s_ndim)
-    ]
-    ns = index_array_harmonics(c, c.root, n_end=n_end_add, expand_dims=True, xp=xp)[
-        (None,) * c.s_ndim + (...,) + (None,) * c.s_ndim
-    ]
+    n = index_array_harmonics(
+        c, c.root, n_end=n_end, expand_dims=True, xp=xp, flatten=True
+    )[:, None, None]
+    ns = index_array_harmonics(
+        c, c.root, n_end=n_end_add, expand_dims=True, xp=xp, flatten=True
+    )[None, :, None]
     ntemp = index_array_harmonics(
-        c, c.root, n_end=n_end + n_end_add - 1, expand_dims=True, xp=xp
-    )[(None,) * (2 * c.s_ndim) + (...,)]
+        c, c.root, n_end=n_end + n_end_add - 1, expand_dims=True, xp=xp, flatten=True
+    )[None, None, :]
 
     # returns [user1,...,userM,n1,...,nN,np1,...,npN]
     coef = (2 * xp.pi) ** (c.e_ndim / 2) * xp.sqrt(2 / xp.pi)
@@ -298,7 +292,7 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
     )
     return coef * xp.sum(
         (-1j) ** (n - ns - ntemp)
-        * t_RS[(...,) + (None,) * (2 * c.s_ndim) + (slice(None),) * c.s_ndim]
+        * t_RS[..., None, None, :]
         * harmonics_twins_expansion(
             c,
             n_end_1=n_end,

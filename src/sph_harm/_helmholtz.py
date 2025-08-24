@@ -128,10 +128,7 @@ def harmonics_regular_singular_component[TEuclidean, TSpherical](
     val = szv(n, c.e_ndim, kr, type=type, derivative=derivative)
     # val = xp.nan_to_num(val, nan=0)
     if flatten:
-        print(val.shape)
-        val = flatten_harmonics(
-            c, val, nodes=[c.root], n_end=n_end, include_negative_m=True
-        )
+        val = flatten_harmonics(c, val, n_end=n_end, include_negative_m=True)
     if not concat:
         return {"r": val}
     return val
