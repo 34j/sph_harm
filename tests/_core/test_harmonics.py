@@ -54,8 +54,8 @@ def test_match_scipy(xp: ArrayNamespaceFull) -> None:
     expected = sph_harm_y_all(
         n_end - 1,
         n_end - 1,
-        to_device(x_spherical["phi"], "cpu"),
         to_device(x_spherical["theta"], "cpu"),
+        to_device(x_spherical["phi"], "cpu"),
     )
     expected = xp.moveaxis(xp.asarray(expected), (0, 1), (-2, -1))
     expected = flatten_harmonics(
@@ -66,7 +66,7 @@ def test_match_scipy(xp: ArrayNamespaceFull) -> None:
         c,
         x_spherical,  # type: ignore
         n_end=n_end,
-        condon_shortley_phase=False,
+        condon_shortley_phase=True,
         concat=True,
         expand_dims=True,
         flatten=True,
