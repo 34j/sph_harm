@@ -3,16 +3,16 @@ from typing import Literal
 
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
+from gumerov_expansion_coefficients import translational_coefficients
 from ultrasphere import SphericalCoordinates, get_child
 
 from ._core import concat_harmonics, expand_dims_harmonics
-from ._core._flatten import _index_array_harmonics
+from ._core._flatten import _index_array_harmonics, index_array_harmonics
 from ._core._harmonics import harmonics
 from ._expansion import (
     expand,
 )
-from ._helmholtz import harmonics_regular_singular_component, harmonics_regular_singular
-from gumerov_expansion_coefficients import translational_coefficients
+from ._helmholtz import harmonics_regular_singular
 
 
 def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
@@ -273,13 +273,13 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
     """
     xp = array_namespace(*[spherical[k] for k in c.s_nodes])
     # [user1,...,userM,n1,...,nN,nsummed1,...,nsummedN,ntemp1,...,ntempN]
-    n = _index_array_harmonics(c, c.root, n_end=n_end, expand_dims=True, xp=xp)[
+    n = index_array_harmonics(c, c.root, n_end=n_end, expand_dims=True, xp=xp)[
         (...,) + (None,) * (2 * c.s_ndim)
     ]
-    ns = _index_array_harmonics(c, c.root, n_end=n_end_add, expand_dims=True, xp=xp)[
+    ns = index_array_harmonics(c, c.root, n_end=n_end_add, expand_dims=True, xp=xp)[
         (None,) * c.s_ndim + (...,) + (None,) * c.s_ndim
     ]
-    ntemp = _index_array_harmonics(
+    ntemp = index_array_harmonics(
         c, c.root, n_end=n_end + n_end_add - 1, expand_dims=True, xp=xp
     )[(None,) * (2 * c.s_ndim) + (...,)]
 
@@ -294,6 +294,7 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
         concat=True,
         k=k,
         type="regular" if is_type_same else "singular",
+        flatten=False,
     )
     return coef * xp.sum(
         (-1j) ** (n - ns - ntemp)
@@ -360,10 +361,13 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
     """
     if method == "gumerov":
         if c.branching_types_expression_str == "ba":
-            return translational_coefficients(k * spherical["r"],
-                                              spherical[c.root],
-                                              spherical[get_child(c.G, c.root, "cos")],
-                                              n_end=n_end, same=is_type_same,)
+            return translational_coefficients(
+                k * spherical["r"],
+                spherical[c.root],
+                spherical[get_child(c.G, c.root, "cos")],
+                n_end=n_end,
+                same=is_type_same,
+            )
         else:
             raise NotImplementedError()
     elif method == "plane_wave":

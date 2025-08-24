@@ -3,24 +3,17 @@ from typing import Literal
 import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
-from array_api_negative_index import to_symmetric
 from ultrasphere import (
     SphericalCoordinates,
     c_spherical,
     from_branching_types,
-    hopf,
-    standard,
 )
 from ultrasphere import random_ball as random_points
-from ultrasphere.special import szv
 
-from sph_harm._core import harmonics
 from sph_harm._helmholtz import (
     harmonics_regular_singular,
-    harmonics_regular_singular_component,
 )
 from sph_harm._translation import harmonics_translation_coef
-
 
 
 def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> None:
@@ -79,7 +72,6 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
             axis=tuple(range(-c.s_ndim, 0)),
         )
         print(xp.round(expected[5, 2], decimals=6), xp.round(actual[5, 2], decimals=6))
-
 
 
 @pytest.mark.parametrize(
@@ -162,7 +154,8 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         is_type_same=from_ == to_,
     )
     actual = xp.vecdot(
-        x_RS[..., None, :], coef,
+        x_RS[..., None, :],
+        coef,
         axis=-1,
     )
     wrong_idx = xp.abs(actual - expected) > 1e-3

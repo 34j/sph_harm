@@ -1,7 +1,6 @@
 from collections.abc import Iterable, Mapping
 from typing import Literal, overload
 
-import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 from array_api_negative_index import to_symmetric
@@ -264,7 +263,7 @@ def flatten_harmonics[TSpherical, TEuclidean](
     )
     harmonics = xp.broadcast_to(
         harmonics,
-        (*harmonics.shape[:-c.s_ndim], *mask.shape),
+        (*harmonics.shape[: -c.s_ndim], *mask.shape),
     )
     return harmonics[..., mask]
 
