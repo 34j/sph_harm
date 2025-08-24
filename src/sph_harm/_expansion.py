@@ -168,7 +168,7 @@ def expand[TEuclidean, TSpherical](
 
         # calculate harmonics
         harmonics = harmonics__(
-            c,  
+            c,
             xs,
             n_end=n_end,
             condon_shortley_phase=condon_shortley_phase,
@@ -215,7 +215,7 @@ def expand[TEuclidean, TSpherical](
             harmonics = harmonics[
                 (slice(None),) * c.s_ndim + (None,) * ndim_val + (slice(None),)
             ]
-            result = val * harmonics.conj()
+            result = val * xp.conj(harmonics)
 
         return result
 
@@ -297,12 +297,13 @@ def expand_evaluate[TEuclidean, TSpherical](
     )
     n_end, _ = assume_n_end_and_include_negative_m_from_harmonics(c, expansion)
     harmonics = harmonics__(
-        c,  # type: ignore
+        c,
         spherical,
-        n_end,
+        n_end=n_end,
         condon_shortley_phase=condon_shortley_phase,
         expand_dims=not is_mapping,
         concat=not is_mapping,
+        flatten=True,
     )
     if is_mapping:
         result: dict[TSpherical, Array] = {}
@@ -331,22 +332,18 @@ def expand_evaluate[TEuclidean, TSpherical](
         return result
     if isinstance(expansion, Mapping):
         raise AssertionError()
-    # expansion: f1,...,fL,harm1,...,harmN
-    # harmonics: u1,...,uM,harm1,...,harmN
+    # expansion: f1,...,fL,harm
+    # harmonics: u1,...,uM,harm
     # result: u1,...,uM,f1,...,fL
-    ndim_harmonics = c.s_ndim
-    ndim_expansion = expansion.ndim - ndim_harmonics
-    ndim_extra_harmonics = harmonics.ndim - ndim_harmonics
+    ndim_expansion = expansion.ndim - 1
+    ndim_extra_harmonics = harmonics.ndim - 1
     expansion = expansion[
-        (None,) * (ndim_extra_harmonics)
-        + (slice(None),) * (ndim_expansion + ndim_harmonics)
+        (None,) * (ndim_extra_harmonics) + (slice(None),) * (ndim_expansion + 1)
     ]
     harmonics = harmonics[
         (slice(None),) * ndim_extra_harmonics
         + (None,) * ndim_expansion
-        + (slice(None),) * ndim_harmonics
+        + (slice(None),)
     ]
-    result = harmonics * expansion
-    for _ in range(ndim_harmonics):
-        result = xp.sum(result, axis=-1)
+    result = xp.vecdot(harmonics, expansion, axis=-1)
     return result

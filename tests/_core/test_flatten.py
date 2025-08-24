@@ -8,7 +8,6 @@ from sph_harm._core import harmonics as harmonics_
 from sph_harm._core._flatten import (
     _index_array_harmonics_all,
     flatten_harmonics,
-    flatten_mask_harmonics,
     unflatten_harmonics,
 )
 
@@ -46,7 +45,6 @@ def test_index_array_harmonics_all[TEuclidean, TSpherical](
         assert xp.all(iall_concat[i] == iall[s_node])
 
 
-
 @pytest.mark.parametrize(
     "c",
     [
@@ -67,8 +65,8 @@ def test_flatten_unflatten_harmonics[TSpherical, TEuclidean](
         condon_shortley_phase=False,
         concat=True,
         expand_dims=True,
-        flatten=False
+        flatten=False,
     )
     flattened = flatten_harmonics(c, harmonics)
-    unflattened = unflatten_harmonics(c, flattened, n_end=n_end)
+    unflattened = unflatten_harmonics(c, flattened)
     assert xp.all(harmonics == unflattened)

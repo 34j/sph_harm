@@ -46,7 +46,7 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
 ) -> None:
     def f(spherical: Mapping[TSpherical, Array]) -> Array:
         return harmonics(
-            c, 
+            c,
             spherical,
             n_end=n_end,
             condon_shortley_phase=condon_shortley_phase,
@@ -61,7 +61,7 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
         n_end=n_end,
         does_f_support_separation_of_variables=not concat,
         condon_shortley_phase=condon_shortley_phase,
-        xp=xp
+        xp=xp,
     )
     if not concat:
         for key, value in actual.items():
@@ -72,12 +72,13 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
                 expansion_nonzero[:, : ndim_harmonics(c, key)],
                 expansion_nonzero[:, ndim_harmonics(c, key) :],
             )
-            idx = xp.stack(xp.nonzero((l[:-1, :] == r[:-1, :]).all(axis=-1)), axis=-1).squeeze()
+            idx = xp.stack(
+                xp.nonzero((l[:-1, :] == r[:-1, :]).all(axis=-1)), axis=-1
+            ).squeeze()
             assert xp.all(l[idx, :] == r[idx, :])
     else:
         expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)))
         assert xp.all(xpx.isclose(actual, expected))
-        
 
 
 @pytest.mark.parametrize(

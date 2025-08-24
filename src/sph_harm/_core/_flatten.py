@@ -77,7 +77,8 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
 ) -> Mapping[TSpherical, Array]: ...
 @overload
 def _index_array_harmonics_all[TSpherical, TEuclidean](
-    c: SphericalCoordinates[TSpherical, TEuclidean],/,
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    /,
     *,
     n_end: int,
     xp: ArrayNamespaceFull,
@@ -89,7 +90,8 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
 
 
 def _index_array_harmonics_all[TSpherical, TEuclidean](
-    c: SphericalCoordinates[TSpherical, TEuclidean],/,
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    /,
     *,
     n_end: int,
     xp: ArrayNamespaceFull,
@@ -248,9 +250,11 @@ def flatten_harmonics[TSpherical, TEuclidean](
     """
     xp = array_namespace(harmonics)
     n_end, include_negative_m = assume_n_end_and_include_negative_m_from_harmonics(
-        c, harmonics
+        c, harmonics, flatten=False
     )
-    mask = flatten_mask_harmonics(c, n_end=n_end, xp=xp, include_negative_m=include_negative_m)
+    mask = flatten_mask_harmonics(
+        c, n_end=n_end, xp=xp, include_negative_m=include_negative_m
+    )
     return harmonics[..., mask]
 
 
@@ -258,7 +262,6 @@ def unflatten_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Array,
     *,
-    n_end: int,
     include_negative_m: bool = True,
 ) -> Array:
     """
@@ -268,8 +271,6 @@ def unflatten_harmonics[TSpherical, TEuclidean](
     ----------
     harmonics : Array
         The flattened harmonics.
-    n_end : int
-        The maximum degree of the harmonic.
     include_negative_m : bool, optional
         Whether to include negative m values, by default True
 
@@ -280,7 +281,12 @@ def unflatten_harmonics[TSpherical, TEuclidean](
 
     """
     xp = array_namespace(harmonics)
-    mask = flatten_mask_harmonics(c, n_end=n_end, xp=xp, include_negative_m=include_negative_m)
+    n_end, _ = assume_n_end_and_include_negative_m_from_harmonics(
+        c, harmonics, flatten=True
+    )
+    mask = flatten_mask_harmonics(
+        c, n_end=n_end, xp=xp, include_negative_m=include_negative_m
+    )
     shape = (*harmonics.shape[:-1], *mask.shape)
     result = xp.zeros(shape, dtype=harmonics.dtype, device=harmonics.device)
     result[..., mask] = harmonics

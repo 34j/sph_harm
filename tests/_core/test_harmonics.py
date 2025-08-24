@@ -3,9 +3,12 @@ from collections.abc import Mapping
 import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api_compat import to_device
+from scipy.special import sph_harm_y_all
 from ultrasphere import SphericalCoordinates, c_spherical, hopf, integrate, standard
 
 from sph_harm._core import harmonics
+from sph_harm._core._flatten import flatten_harmonics
 from sph_harm._ndim import harm_n_ndim_le
 
 
@@ -40,3 +43,32 @@ def test_harmonics_orthogonal[TSpherical, TEuclidean](
 
     actual = integrate(c, f, False, 2 * n_end - 1, xp=xp)
     assert xp.all(xpx.isclose(actual, expected))
+
+
+def test_match_scipy(xp: ArrayNamespaceFull) -> None:
+    c = c_spherical()
+    n_end = 2
+    shape = ()
+    x = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
+    x_spherical = c.from_euclidean(x)
+    expected = sph_harm_y_all(
+        n_end - 1,
+        n_end - 1,
+        to_device(x_spherical["phi"], "cpu"),
+        to_device(x_spherical["theta"], "cpu"),
+    )
+    expected = xp.moveaxis(xp.asarray(expected), (0, 1), (-2, -1))
+    expected = flatten_harmonics(
+        c,
+        expected,
+    )
+    actual = harmonics(
+        c,
+        x_spherical,  # type: ignore
+        n_end=n_end,
+        condon_shortley_phase=False,
+        concat=True,
+        expand_dims=True,
+        flatten=True,
+    )
+    assert xp.all(xpx.isclose(actual, expected, rtol=1e-3, atol=1e-3))
