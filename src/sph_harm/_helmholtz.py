@@ -8,11 +8,11 @@ from ultrasphere import SphericalCoordinates
 from ultrasphere.special import szv
 
 from ._core._assume import assume_n_end_and_include_negative_m_from_harmonics
-from ._core._flatten import _index_array_harmonics
-
+from ._core._flatten import _index_array_harmonics, flatten_harmonics
+from ._core._expand_dim import _expand_dim_harmoncis
 
 @overload
-def harmonics_regular_singular[TEuclidean, TSpherical](
+def harmonics_regular_singular_component[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
         Mapping[TSpherical | Literal["r"], Array] | Mapping[Literal["r"], Array]
@@ -27,7 +27,7 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
 
 
 @overload
-def harmonics_regular_singular[TEuclidean, TSpherical](
+def harmonics_regular_singular_component[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
         Mapping[TSpherical | Literal["r"], Array] | Mapping[Literal["r"], Array]
@@ -41,17 +41,20 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
 ) -> Array: ...
 
 
-def harmonics_regular_singular[TEuclidean, TSpherical](
+def harmonics_regular_singular_component[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
         Mapping[TSpherical | Literal["r"], Array] | Mapping[Literal["r"], Array]
     ),
+    /,
     *,
+    n_end: int,
     k: Array,
     type: Literal["regular", "singular", "j", "y", "h1", "h2"],
     derivative: bool = False,
-    harmonics: Array | Mapping[TSpherical, Array],
-    multiply: bool = True,
+    expand_dims: bool = True,
+    flatten: bool | None = None,
+    concat: bool = True,
 ) -> Array | Mapping[TSpherical, Array]:
     """
     Regular or singular harmonics.
@@ -87,22 +90,12 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
         If the wavenumber is not positive.
 
     """
-    xp = array_namespace(
-        *(
-            *[spherical[k] for k in c.s_nodes],  # type: ignore
-            k,
-            *(harmonics.values() if isinstance(harmonics, Mapping) else (harmonics,)),
-        )
-    )
-    is_mapping = isinstance(harmonics, Mapping)
-    if multiply and is_mapping:
-        raise ValueError("multiply must be False if harmonics is Mapping.")
-    n_end, include_negative_m = assume_n_end_and_include_negative_m_from_harmonics(
-        c, harmonics
-    )
+    xp = array_namespace(k, *[spherical[k] for k in c.s_nodes])
+    extra_dims = spherical["r"].ndim
     n = _index_array_harmonics(
-        c, c.root, n_end=n_end, include_negative_m=include_negative_m, xp=xp
-    )[(None,) * spherical["r"].ndim + (slice(None),)]
+    c, c.root, n_end=n_end, include_negative_m=True, xp=xp, expand_dims=expand_dims
+)[(None,) * extra_dims + (slice(None),)]
+    
     kr = k * spherical["r"]
     kr = kr[..., None]
 
@@ -111,16 +104,9 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
     elif type == "singular":
         type = "h1"
     val = szv(n, c.e_ndim, kr, type=type, derivative=derivative)
-    val = xp.nan_to_num(val, nan=0)
-    expand_dims = not (is_mapping and len({h.ndim for h in harmonics.values()}) > 1)
-    if expand_dims:
-        idx = c.s_nodes.index(c.root)
-        val = val[(..., *create_slice(c.s_ndim, [(idx, slice(None))], default=None))]
-    if is_mapping:
-        res = {"r": val}
-        if harmonics is not None:
-            res.update(harmonics)  # type: ignore
-        return res
-    if multiply:
-        return val * harmonics
+    # val = xp.nan_to_num(val, nan=0)
+    if flatten:
+        val = flatten_harmonics(c, val, nodes=[c.root])
+    if not concat:
+        return {"r": val}
     return val

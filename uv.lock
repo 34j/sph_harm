@@ -73,6 +73,18 @@ wheels = [
 ]
 
 [[package]]
+name = "array-api-jit"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "array-api-compat" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e7/95/5bddfb7e45188c8e3ad8a1c7ebfae0f5f230cbf26539d171a63bd728e9ae/array_api_jit-1.0.0.tar.gz", hash = "sha256:a896153e17357f87c31f3fe24303917efe5ade8d61d901760fb12faf40889e93", size = 8956, upload-time = "2025-07-14T01:22:35.26Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8f/da/7dda387073f2044e7e35327cbd89c77ae8e1546d85914a1058b5ca371d23/array_api_jit-1.0.0-py3-none-any.whl", hash = "sha256:a60dddcae6ed7f523b0d3cfcbfe3a850d75ec02f07c99ca96869e0ff27027ce9", size = 5893, upload-time = "2025-07-14T01:22:33.759Z" },
+]
+
+[[package]]
 name = "array-api-negative-index"
 version = "0.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -409,6 +421,26 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d0/69/312cd100fa45ddaea5a588334d2defa331ff427bcb61f5fe2ae61bdc3762/furo-2025.7.19.tar.gz", hash = "sha256:4164b2cafcf4023a59bb3c594e935e2516f6b9d35e9a5ea83d8f6b43808fe91f", size = 1662054, upload-time = "2025-07-19T10:52:09.754Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3a/34/2b07b72bee02a63241d654f5d8af87a2de977c59638eec41ca356ab915cd/furo-2025.7.19-py3-none-any.whl", hash = "sha256:bdea869822dfd2b494ea84c0973937e35d1575af088b6721a29c7f7878adc9e3", size = 342175, upload-time = "2025-07-19T10:52:02.399Z" },
+]
+
+[[package]]
+name = "gumerov-expansion-coefficients"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "array-api-compat" },
+    { name = "array-api-extra" },
+    { name = "array-api-jit" },
+    { name = "numba" },
+    { name = "rich" },
+    { name = "scipy" },
+    { name = "torch" },
+    { name = "typer" },
+    { name = "types-array-api" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bf/1f/62c9d22953a761ddc2c52f25c336eac12c7d7ab9d28a14b4ca30951f7622/gumerov_expansion_coefficients-1.1.0.tar.gz", hash = "sha256:89e7d6b5370a71db743160d7c27b0b0d38fb0af9be5ec08ca5b415d006e9cefd", size = 14704, upload-time = "2025-08-20T03:39:28.121Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3c/6d/f3044ffee42df1e98fccd23f08f0c02b65f712b6b1ae01c89dd1621f4fa8/gumerov_expansion_coefficients-1.1.0-py3-none-any.whl", hash = "sha256:4abc947cdcabc2b9af506826ff474be125d883acc7ebf36f53a50191b60f207d", size = 9836, upload-time = "2025-08-20T03:39:25.843Z" },
 ]
 
 [[package]]
@@ -1311,6 +1343,7 @@ version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "array-api-negative-index" },
+    { name = "gumerov-expansion-coefficients" },
     { name = "jacobi-poly" },
     { name = "rich" },
     { name = "shift-nth-row-n-steps" },
@@ -1334,6 +1367,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "array-api-negative-index", specifier = ">=0.1.0" },
+    { name = "gumerov-expansion-coefficients", specifier = ">=1.1.0" },
     { name = "jacobi-poly", specifier = ">=1.0.3" },
     { name = "rich", specifier = ">=10" },
     { name = "shift-nth-row-n-steps", specifier = ">=1.0.0" },

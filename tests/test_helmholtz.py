@@ -15,10 +15,10 @@ from ultrasphere import random_ball as random_points
 from ultrasphere.special import szv
 
 from sph_harm._core import harmonics
-from sph_harm._helmholtz import harmonics_regular_singular
+from sph_harm._helmholtz import harmonics_regular_singular_component
 from sph_harm._translation import (
     harmonics_translation_coef,
-    harmonics_translation_coef_using_triplet,
+    _harmonics_translation_coef_triplet,
     harmonics_twins_expansion,
 )
 
@@ -62,10 +62,10 @@ def test_harmonics_regular_singular_j_expansion[TSpherical, TEuclidean](
         concat=concat,
         expand_dims=expand_dims,
     )
-    x_Z = harmonics_regular_singular(
+    x_Z = harmonics_regular_singular_component(
         c, x_spherical, k=k, harmonics=x_Y, type=type, multiply=concat
     )
-    x_R = harmonics_regular_singular(
+    x_R = harmonics_regular_singular_component(
         c,
         x_spherical,
         k=k,
@@ -81,10 +81,10 @@ def test_harmonics_regular_singular_j_expansion[TSpherical, TEuclidean](
         concat=concat,
         expand_dims=expand_dims,
     )
-    y_Z = harmonics_regular_singular(
+    y_Z = harmonics_regular_singular_component(
         c, y_spherical, k=k, harmonics=y_Y, type=type, multiply=concat
     )
-    y_R = harmonics_regular_singular(
+    y_R = harmonics_regular_singular_component(
         c,
         y_spherical,
         k=k,
@@ -137,7 +137,7 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
     x_spherical = c.from_euclidean(x)
     y_spherical = c.from_euclidean(y)
 
-    y_RS = harmonics_regular_singular(
+    y_RS = harmonics_regular_singular_component(
         c,
         y_spherical,
         k=k,
@@ -151,7 +151,7 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         ),
         type=type,
     )
-    x_RS = harmonics_regular_singular(
+    x_RS = harmonics_regular_singular_component(
         c,
         x_spherical,
         k=k,
@@ -205,7 +205,7 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
 
     n_end = 6
     for n_end_add in [1, 3, 5, 7, 9]:
-        y_RS = harmonics_regular_singular(
+        y_RS = harmonics_regular_singular_component(
             c,
             y_spherical,
             k=k,
@@ -219,7 +219,7 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
             ),
             type="singular",
         )
-        x_RS = harmonics_regular_singular(
+        x_RS = harmonics_regular_singular_component(
             c,
             x_spherical,
             k=k,
@@ -237,7 +237,7 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
         expected = y_RS
 
         # actual
-        coef = harmonics_translation_coef_using_triplet(
+        coef = _harmonics_translation_coef_triplet(
             c,
             t_spherical,
             n_end=n_end,
@@ -343,7 +343,7 @@ def test_harmonics_translation_coef_using_triplet[TSpherical, TEuclidean](
     x_spherical = c.from_euclidean(x)
     y_spherical = c.from_euclidean(y)
 
-    y_RS = harmonics_regular_singular(
+    y_RS = harmonics_regular_singular_component(
         c,
         y_spherical,
         k=k,
@@ -357,7 +357,7 @@ def test_harmonics_translation_coef_using_triplet[TSpherical, TEuclidean](
         ),
         type=to_,
     )
-    x_RS = harmonics_regular_singular(
+    x_RS = harmonics_regular_singular_component(
         c,
         x_spherical,
         k=k,
@@ -375,7 +375,7 @@ def test_harmonics_translation_coef_using_triplet[TSpherical, TEuclidean](
     expected = y_RS
 
     # actual
-    coef = harmonics_translation_coef_using_triplet(
+    coef = _harmonics_translation_coef_triplet(
         c,
         t_spherical,
         n_end=n_end,
@@ -390,7 +390,7 @@ def test_harmonics_translation_coef_using_triplet[TSpherical, TEuclidean](
         idx = n[:, None] - n_add[None, :]
         expected2 = (
             2
-            * harmonics_regular_singular(
+            * harmonics_regular_singular_component(
                 c,
                 t_spherical,
                 k=k,

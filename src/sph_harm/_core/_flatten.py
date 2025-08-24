@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from typing import Literal, overload
+from typing import Iterable, Literal, overload
 
 import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
@@ -21,7 +21,7 @@ def _index_array_harmonics[TSpherical, TEuclidean](
     *,
     n_end: int,
     xp: ArrayNamespaceFull,
-    expand_dims: bool = False,
+    expand_dims: bool = True,
     include_negative_m: bool = True,
 ) -> Array:
     """
@@ -35,7 +35,7 @@ def _index_array_harmonics[TSpherical, TEuclidean](
     n_end : int
         The maximum degree of the harmonic.
     expand_dims : bool, optional
-        Whether to expand dimensions, by default False
+        Whether to expand dimensions, by default True
     include_negative_m : bool, optional
         Whether to include negative m values, by default True
 
@@ -71,7 +71,7 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
     n_end: int,
     xp: ArrayNamespaceFull,
     include_negative_m: bool = ...,
-    expand_dims: bool,
+    expand_dims: bool = ...,
     as_array: Literal[False],
     mask: Literal[False] = ...,
 ) -> Mapping[TSpherical, Array]: ...
@@ -83,7 +83,7 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
     n_end: int,
     xp: ArrayNamespaceFull,
     include_negative_m: bool = ...,
-    expand_dims: Literal[True],
+    expand_dims: Literal[True] = ...,
     as_array: Literal[True],
     mask: bool = ...,
 ) -> Array: ...
@@ -96,7 +96,7 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
     n_end: int,
     xp: ArrayNamespaceFull,
     include_negative_m: bool = True,
-    expand_dims: bool,
+    expand_dims: bool = True,
     as_array: bool,
     mask: bool = False,
 ) -> Array | Mapping[TSpherical, Array]:
@@ -180,6 +180,7 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
     n_end: int,
     xp: ArrayNamespaceFull,
     include_negative_m: bool = True,
+    nodes: Iterable[TSpherical] | None = None,
 ) -> Array:
     """
     Create a mask representing the
@@ -192,6 +193,9 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
         The maximum degree of the harmonic.
     include_negative_m : bool, optional
         Whether to include negative m values, by default True
+    nodes : Iterable[TSpherical] | None, optional
+        The nodes to consider, by default None
+        If None, all nodes are considered.
 
     Returns
     -------
@@ -207,11 +211,15 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
         expand_dims=True,
         xp=xp,
     )
+    if nodes is not None:
+        index_arrays = {node: v for node, v in index_arrays.items() if node in nodes}
     shape = xpx.broadcast_shapes(
         *[index_array.shape for index_array in index_arrays.values()]
     )
     mask = xp.ones(shape, dtype=bool)
     for node, branching_type in c.branching_types.items():
+        if nodes is not None and node not in nodes:
+            continue
         if branching_type == BranchingType.B:
             mask = mask & (
                 xp.abs(index_arrays[get_child(c.G, node, "sin")]) <= index_arrays[node]
@@ -233,6 +241,7 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
 def flatten_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Array,
+    nodes: Iterable[TSpherical] | None = None,
 ) -> Array:
     """
     Flatten the harmonics.
@@ -241,6 +250,9 @@ def flatten_harmonics[TSpherical, TEuclidean](
     ----------
     harmonics : Array
         The (unflattend) harmonics.
+    nodes : Iterable[TSpherical] | None, optional
+        The nodes to consider, by default None
+        If None, all nodes are considered.
 
     Returns
     -------
@@ -253,7 +265,7 @@ def flatten_harmonics[TSpherical, TEuclidean](
         c, harmonics, flatten=False
     )
     mask = flatten_mask_harmonics(
-        c, n_end=n_end, xp=xp, include_negative_m=include_negative_m
+        c, n_end=n_end, xp=xp, include_negative_m=include_negative_m, nodes=nodes
     )
     return harmonics[..., mask]
 
@@ -300,7 +312,7 @@ def index_array_harmonics[TSpherical, TEuclidean](
     *,
     n_end: int,
     xp: ArrayNamespaceFull,
-    expand_dims: bool = False,
+    expand_dims: bool = True,
     include_negative_m: bool = True,
     flatten: bool = False,
 ) -> Array:
@@ -315,7 +327,7 @@ def index_array_harmonics[TSpherical, TEuclidean](
     n_end : int
         The maximum degree of the harmonic.
     expand_dims : bool, optional
-        Whether to expand dimensions, by default False
+        Whether to expand dimensions, by default True
     include_negative_m : bool, optional
         Whether to include negative m values, by default True
         If None, True iff concat is True.

@@ -11,10 +11,10 @@ from ._core._harmonics import harmonics as harmonics_
 from ._expansion import (
     expand,
 )
-from ._helmholtz import harmonics_regular_singular
+from ._helmholtz import harmonics_regular_singular_component
+from gumerov_expansion_coefficients import translational_coefficients
 
-
-def harmonics_translation_coef[TEuclidean, TSpherical](
+def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     euclidean: Mapping[TEuclidean, Array],
     *,
@@ -118,7 +118,6 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
         xp=xp,
     )
 
-
 def harmonics_twins_expansion[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
@@ -128,7 +127,6 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
     xp: ArrayNamespaceFull,
     conj_1: bool = False,
     conj_2: bool = False,
-    analytic: bool = False,
 ) -> Array:
     """
     Expansion coefficients of the twins of the harmonics.
@@ -151,10 +149,6 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
     conj_2 : bool
         Whether to conjugate the second harmonics.
         by default False
-    analytic : bool
-        Whether to use the analytic formula,
-        instead of the numerical integration,
-        by default False
 
     Returns
     -------
@@ -175,80 +169,6 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
     `harmonics_twins_expansion(conj_1=True, conj_2=True)`
 
     """
-    if analytic:
-        n1 = _index_array_harmonics(c, c.root, n_end=n_end_1, expand_dims=True, xp=xp)
-        n2 = _index_array_harmonics(c, c.root, n_end=n_end_2, expand_dims=True, xp=xp)
-        n3 = _index_array_harmonics(
-            c, c.root, n_end=n_end_1 + n_end_2 - 1, expand_dims=True, xp=xp
-        )
-        if c.e_ndim == 2:
-            n1 = n1[:, None, None]
-            n2 = n2[None, :, None]
-            n3 = n3[None, None, :]
-            if conj_1:
-                n1 = -n1
-            if conj_2:
-                n2 = -n2
-            n3 = -n3
-            result = (n1 + n2 + n3 == 0) / xp.sqrt(2 * xp.pi)
-            if condon_shortley_phase:
-                result *= (-1) ** (n1 + n2 + n3)
-            return result
-        elif c.e_ndim == 3:
-            from py3nj import wigner3j
-
-            another_node = (set(c.s_nodes) - {c.root}).pop()
-            m1 = _index_array_harmonics(
-                c, another_node, n_end=n_end_1, expand_dims=True, xp=xp
-            )
-            m2 = _index_array_harmonics(
-                c, another_node, n_end=n_end_2, expand_dims=True, xp=xp
-            )
-            m3 = _index_array_harmonics(
-                c, another_node, n_end=n_end_1 + n_end_2 - 1, expand_dims=True, xp=xp
-            )
-            n1 = n1[(...,) + (None,) * 4]
-            m1 = m1[(...,) + (None,) * 4]
-            n2 = n2[(None,) * 2 + (...,) + (None,) * 2]
-            m2 = m2[(None,) * 2 + (...,) + (None,) * 2]
-            n3 = n3[(None,) * 4 + (...,)]
-            m3 = m3[(None,) * 4 + (...,)]
-            if conj_1:
-                m1 = -m1
-            if conj_2:
-                m2 = -m2
-            m3 = -m3
-            result = (
-                xp.where(m1 <= 0, 1, (-1) ** xp.abs(m1))
-                * xp.where(m2 <= 0, 1, (-1) ** xp.abs(m2))
-                * xp.where(m3 <= 0, 1, (-1) ** xp.abs(m3))
-                # * (n1 >= xp.abs(m1))
-                # * (n2 >= xp.abs(m2))
-                # * (n3 >= xp.abs(m3))
-                * xp.sqrt((2 * n1 + 1) * (2 * n2 + 1) * (2 * n3 + 1) / (4 * xp.pi))
-                * wigner3j(
-                    2 * n1,
-                    2 * n2,
-                    2 * n3,
-                    2 * m1,
-                    2 * m2,
-                    2 * m3,
-                    ignore_invalid=True,
-                )
-                * wigner3j(
-                    2 * n1,
-                    2 * n2,
-                    2 * n3,
-                    xp.zeros_like(n1, dtype=int),
-                    xp.zeros_like(n2, dtype=int),
-                    xp.zeros_like(n3, dtype=int),
-                    ignore_invalid=True,
-                )
-            )
-            if condon_shortley_phase:
-                result *= (-1) ** (m1 + m2 + m3)
-            return result
-
     def to_expand(spherical: Mapping[TSpherical, Array]) -> Array:
         # returns [theta,n1,...,nN,nsummed1,...,nsummedN]
         # Y(n)Y*(nsummed)
@@ -302,7 +222,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
     )
 
 
-def harmonics_translation_coef_using_triplet[TEuclidean, TSpherical](
+def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: Mapping[TSpherical | Literal["r"], Array],
     *,
@@ -370,7 +290,7 @@ def harmonics_translation_coef_using_triplet[TEuclidean, TSpherical](
         expand_dims=True,
         concat=True,
     )
-    t_RS = harmonics_regular_singular(
+    t_RS = harmonics_regular_singular_component(
         c,
         spherical,
         harmonics=t_Y,
@@ -392,3 +312,52 @@ def harmonics_translation_coef_using_triplet[TEuclidean, TSpherical](
         ),
         axis=tuple(range(-c.s_ndim, 0)),
     )
+
+
+def harmonics_translation_coef_triplet[TEuclidean, TSpherical](
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    spherical: Mapping[TSpherical | Literal["r"], Array],
+    *,
+    n_end: int,
+    n_end_add: int,
+    condon_shortley_phase: bool,
+    k: Array,
+    is_type_same: bool,
+    method: Literal["gumerov", "plane_wave", "triplet"] | None = None
+) -> Array:
+    r"""
+    Translation coefficients between same or different type of elementary solutions.
+
+    If is_type_same is True, returns (R|R) = (S|S).
+    If is_type_same is False, returns (S|R).
+
+    .. math::
+        R(x + t) = \sum_n (R|R)_n(t) R(x)
+        S(x + t) = \sum_n (S|S)_n(t) S(x)
+        S(x + t) = \sum_n (S|R)_n(t) R(x)
+
+    Parameters
+    ----------
+    spherical : Mapping[TSpherical, Array]
+        The translation vector in spherical coordinates.
+    n_end : int
+        The maximum degree of the harmonic.
+    n_end_add : int
+        The maximum degree of the harmonic to be summed over.
+    condon_shortley_phase : bool
+        Whether to apply the Condon-Shortley phase.
+    k : Array
+        The wavenumber.
+    is_type_same : bool
+        Whether the type of the elementary solutions is same.
+
+    Returns
+    -------
+    Array
+        The translation coefficients of `2 * c.s_ndim` dimensions.
+        [-c.s_ndim,-1] dimensions are to be
+        summed over with the elementary solutions
+        to get translated elementary solution
+        which quantum number is [-2*c.s_ndim,-c.s_ndim-1] indices.
+
+    """

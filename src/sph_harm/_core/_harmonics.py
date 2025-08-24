@@ -147,7 +147,7 @@ def harmonics(
     index_with_surrogate_quantum_number: bool = False,
     expand_dims: bool = True,
     flatten: bool | None = None,
-    concat: bool = False,
+    concat: bool = True,
 ) -> Mapping[TSpherical, Array] | Array:
     """
     Calculate the spherical harmonics.
