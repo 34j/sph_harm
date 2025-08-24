@@ -66,6 +66,7 @@ def _index_array_harmonics[TSpherical, TEuclidean](
 @overload
 def _index_array_harmonics_all[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
+    /,
     *,
     n_end: int,
     xp: ArrayNamespaceFull,
@@ -76,7 +77,7 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
 ) -> Mapping[TSpherical, Array]: ...
 @overload
 def _index_array_harmonics_all[TSpherical, TEuclidean](
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TEuclidean],/,
     *,
     n_end: int,
     xp: ArrayNamespaceFull,
@@ -88,7 +89,7 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
 
 
 def _index_array_harmonics_all[TSpherical, TEuclidean](
-    c: SphericalCoordinates[TSpherical, TEuclidean],
+    c: SphericalCoordinates[TSpherical, TEuclidean],/,
     *,
     n_end: int,
     xp: ArrayNamespaceFull,
@@ -172,6 +173,8 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
 
 def flatten_mask_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
+    /,
+    *,
     n_end: int,
     xp: ArrayNamespaceFull,
     include_negative_m: bool = True,
@@ -247,7 +250,7 @@ def flatten_harmonics[TSpherical, TEuclidean](
     n_end, include_negative_m = assume_n_end_and_include_negative_m_from_harmonics(
         c, harmonics
     )
-    mask = flatten_mask_harmonics(c, n_end, xp, include_negative_m)
+    mask = flatten_mask_harmonics(c, n_end=n_end, xp=xp, include_negative_m=include_negative_m)
     return harmonics[..., mask]
 
 
@@ -277,7 +280,7 @@ def unflatten_harmonics[TSpherical, TEuclidean](
 
     """
     xp = array_namespace(harmonics)
-    mask = flatten_mask_harmonics(c, n_end, include_negative_m)
+    mask = flatten_mask_harmonics(c, n_end=n_end, xp=xp, include_negative_m=include_negative_m)
     shape = (*harmonics.shape[:-1], *mask.shape)
     result = xp.zeros(shape, dtype=harmonics.dtype, device=harmonics.device)
     result[..., mask] = harmonics
@@ -287,6 +290,7 @@ def unflatten_harmonics[TSpherical, TEuclidean](
 def index_array_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     node: TSpherical,
+    /,
     *,
     n_end: int,
     xp: ArrayNamespaceFull,
@@ -422,11 +426,11 @@ def index_array_harmonics_all[TSpherical, TEuclidean](
     index_arrays = _index_array_harmonics_all(
         c,
         n_end=n_end,
+        xp=xp,
         include_negative_m=include_negative_m,
         as_array=as_array,
         expand_dims=expand_dims,
         mask=mask,
-        xp=xp,
     )
     if flatten:
         if as_array:
