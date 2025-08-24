@@ -64,7 +64,7 @@ def _index_array_harmonics[TSpherical, TEuclidean](
 
 
 @overload
-def _index_array_harmonics_all(
+def _index_array_harmonics_all[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
@@ -75,7 +75,7 @@ def _index_array_harmonics_all(
     mask: Literal[False] = ...,
 ) -> Mapping[TSpherical, Array]: ...
 @overload
-def _index_array_harmonics_all(
+def _index_array_harmonics_all[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
@@ -87,7 +87,7 @@ def _index_array_harmonics_all(
 ) -> Array: ...
 
 
-def _index_array_harmonics_all(
+def _index_array_harmonics_all[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
@@ -170,7 +170,7 @@ def _index_array_harmonics_all(
     return index_arrays
 
 
-def flatten_mask_harmonics(
+def flatten_mask_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     xp: ArrayNamespaceFull,
@@ -225,7 +225,7 @@ def flatten_mask_harmonics(
     return mask
 
 
-def flatten_harmonics(
+def flatten_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Array,
 ) -> Array:
@@ -251,7 +251,7 @@ def flatten_harmonics(
     return harmonics[..., mask]
 
 
-def unflatten_harmonics(
+def unflatten_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     harmonics: Array,
     *,
