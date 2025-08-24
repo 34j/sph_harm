@@ -260,6 +260,9 @@ def expand_evaluate[TEuclidean, TSpherical](
     """
     Evaluate the expansion at the spherical coordinates.
 
+    Make sure to compare with values on the SPHERE,
+    not in the ball.
+
     Parameters
     ----------
     expansion : Mapping[TSpherical, Array] | Array
@@ -345,6 +348,5 @@ def expand_evaluate[TEuclidean, TSpherical](
         + (None,) * ndim_expansion
         + (slice(None),)
     ]
-    print(harmonics.shape, expansion.shape)
-    result = xp.vecdot(harmonics, expansion, axis=-1)
+    result = xp.sum(harmonics * expansion, axis=-1)
     return result

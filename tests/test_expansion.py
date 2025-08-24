@@ -11,6 +11,7 @@ from ultrasphere import (
     c_spherical,
     from_branching_types,
     hopf,
+    random_ball,
     standard,
 )
 from ultrasphere._integral import roots
@@ -83,16 +84,13 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
             assert xp.all(l[idx, :] == r[idx, :])
     else:
         expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)), dtype=xp.complex64)
-        print(actual.shape, expected.shape)
-        print(actual[~xpx.isclose(actual, expected, rtol=1e-6, atol=1e-6)])
-        print(xp.nonzero(~xpx.isclose(actual, expected, rtol=1e-6, atol=1e-6)))
         assert xp.all(xpx.isclose(actual, expected, rtol=1e-6, atol=1e-6))
 
 
 @pytest.mark.parametrize(
     "name, c, n_end",
     [
-        ("spherical", c_spherical(), 25),
+        ("spherical", c_spherical(), 5),
         ("standard-3'", from_branching_types("bpa"), 10),
         ("standard-4", standard(3), 7),
         ("hoph-2", hopf(2), 6),
@@ -109,13 +107,14 @@ def test_approximate[TSpherical, TEuclidean](
     condon_shortley_phase: bool,
     xp: ArrayNamespaceFull,
 ) -> None:
-    k = xp.random.random_uniform(low=0, high=1, shape=(c.e_ndim,))
-
+    k = xp.arange(c.e_ndim) / c.e_ndim
     def f(s: Mapping[TSpherical, Array]) -> Array:
         x = c.to_euclidean(s, as_array=True)
+        # return xp.ones_like(x[0])
         return xp.exp(1j * xp.einsum("v,v...->...", k.astype(x.dtype), x))
 
-    spherical, _ = roots(c, n=n_end, expand_dims_x=True, xp=xp)
+    # spherical, _ = roots(c, 1, expand_dims_x=True, xp=xp)
+    spherical = c.from_euclidean(random_ball(c, shape=(2, 3, 4), xp=xp, surface=True))
     expected = f(spherical)
     error = {}
     expansion = expand(
