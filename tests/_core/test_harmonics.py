@@ -45,9 +45,9 @@ def test_harmonics_orthogonal[TSpherical, TEuclidean](
     assert xp.all(xpx.isclose(actual, expected))
 
 
-def test_match_scipy(xp: ArrayNamespaceFull) -> None:
+@pytest.mark.parametrize("n_end", [1, 2, 5]) # scipy does not support n_end == 0
+def test_match_scipy(n_end: int, xp: ArrayNamespaceFull) -> None:
     c = c_spherical()
-    n_end = 2
     shape = ()
     x = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
     x_spherical = c.from_euclidean(x)
