@@ -15,7 +15,7 @@ from ._assume import assume_n_end_and_include_negative_m_from_harmonics
 from array_api_negative_index import to_symmetric
 
 
-def index_array_harmonics[TSpherical, TEuclidean](
+def _index_array_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     node: TSpherical,
     *,
@@ -64,7 +64,7 @@ def index_array_harmonics[TSpherical, TEuclidean](
 
 
 @overload
-def index_array_harmonics_all(
+def _index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
@@ -75,7 +75,7 @@ def index_array_harmonics_all(
     mask: Literal[False] = ...,
 ) -> Mapping[TSpherical, Array]: ...
 @overload
-def index_array_harmonics_all(
+def _index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
@@ -87,7 +87,7 @@ def index_array_harmonics_all(
 ) -> Array: ...
 
 
-def index_array_harmonics_all(
+def _index_array_harmonics_all(
     c: SphericalCoordinates[TSpherical, TEuclidean],
     *,
     n_end: int,
@@ -144,7 +144,7 @@ def index_array_harmonics_all(
     if mask and not as_array:
         raise ValueError("mask must be False if as_array is False.")
     index_arrays = {
-        node: index_array_harmonics(
+        node: _index_array_harmonics(
             c,
             node,
             xp=xp,
@@ -194,7 +194,7 @@ def flatten_mask_harmonics(
         The mask.
 
     """
-    index_arrays = index_array_harmonics_all(
+    index_arrays = _index_array_harmonics_all(
         c,
         n_end=n_end,
         include_negative_m=include_negative_m,
@@ -282,3 +282,153 @@ def unflatten_harmonics(
     result = xp.zeros(shape, dtype=harmonics.dtype, device=harmonics.device)
     result[..., mask] = harmonics
     return result
+
+
+def index_array_harmonics[TSpherical, TEuclidean](
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    node: TSpherical,
+    *,
+    n_end: int,
+    xp: ArrayNamespaceFull,
+    expand_dims: bool = False,
+    include_negative_m: bool = True,
+    flatten: bool = False,
+) -> Array:
+    """
+    The index of the eigenfunction
+    corresponding to the node.
+
+    Parameters
+    ----------
+    node : TSpherical
+        The node of the spherical coordinates.
+    n_end : int
+        The maximum degree of the harmonic.
+    expand_dims : bool, optional
+        Whether to expand dimensions, by default False
+    include_negative_m : bool, optional
+        Whether to include negative m values, by default True
+        If None, True iff concat is True.
+    flatten : bool, optional
+        Whether to flatten the result, by default False
+
+    Returns
+    -------
+    Array
+        The index.
+
+    """
+    if flatten and not expand_dims:
+        raise ValueError("expand_dims must be True if flatten is True.")
+    index_array = _index_array_harmonics(
+        c,
+        node,
+        n_end=n_end,
+        xp=xp,
+        expand_dims=expand_dims,
+        include_negative_m=include_negative_m,
+    )
+    if flatten:
+        return flatten_harmonics(c, index_array)
+    return index_array
+
+@overload
+def index_array_harmonics_all[TSpherical, TEuclidean](
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    *,
+    n_end: int,
+    xp: ArrayNamespaceFull,
+    include_negative_m: bool = ...,
+    expand_dims: bool,
+    as_array: Literal[False],
+    mask: Literal[False] = ...,
+    flatten: bool | None = ...,
+) -> Mapping[TSpherical, Array]: ...
+@overload
+def index_array_harmonics_all[TSpherical, TEuclidean](
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    *,
+    n_end: int,
+    xp: ArrayNamespaceFull,
+    include_negative_m: bool = ...,
+    expand_dims: Literal[True],
+    as_array: Literal[True],
+    mask: bool = ...,
+    flatten: bool | None = ...,
+) -> Array: ...
+
+
+def index_array_harmonics_all[TSpherical, TEuclidean](
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    *,
+    n_end: int,
+    xp: ArrayNamespaceFull,
+    include_negative_m: bool = True,
+    expand_dims: bool,
+    as_array: bool,
+    mask: bool = False,
+    flatten: bool | None = None,
+) -> Array | Mapping[TSpherical, Array]:
+    """
+    The all indices of the eigenfunction
+    corresponding to the spherical coordinates.
+
+    Parameters
+    ----------
+    n_end : int
+        The maximum degree of the harmonic.
+    include_negative_m : bool, optional
+        Whether to include negative m values, by default True
+    expand_dims : bool, optional
+        Whether to expand dimensions, by default True
+        Must be True if as_array is True.
+    as_array : bool, optional
+        Whether to return as an array, by default False
+    mask : bool, optional
+        Whether to fill invalid quantum numbers with NaN, by default False
+        Must be False if as_array is False.
+    flatten : bool, optional
+        Whether to flatten the result, by default None
+        If None, True iff as_array is True.
+
+    Returns
+    -------
+    Array | Mapping[TSpherical, Array]
+        If as_array is True, the indices of shape
+        [c.s_ndim,
+        len(index_array_harmonics(c, node1)),
+        ...,
+        len(index_array_harmonics(c, node(c.s_ndim)))].
+        If as_array is False, the dictionary of indices.
+
+    Notes
+    -----
+        To check the indices where all quantum numbers match,
+        `(numbers1 == numbers2).all(axis=0)`
+        can be used.
+
+    Raises
+    ------
+    ValueError
+        If expand_dims is False and as_array is True.
+        If mask is True and as_array is False.
+
+    """
+    if flatten is None:
+        flatten = as_array
+    if flatten and not expand_dims:
+        raise ValueError("expand_dims must be True if flatten is True.")
+    index_arrays = _index_array_harmonics_all(
+        c,
+        n_end=n_end,
+        include_negative_m=include_negative_m,
+        as_array=as_array,             
+        expand_dims=expand_dims,
+        mask=mask,
+        xp=xp,
+    )
+    if flatten:
+        if as_array:
+            return flatten_harmonics(c, index_arrays) 
+        return {node: flatten_harmonics(c, index_array) for node, index_array in index_arrays.items()}  # type: ignore
+    return index_arrays 

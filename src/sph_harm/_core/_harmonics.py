@@ -117,7 +117,7 @@ def harmonics(
     include_negative_m: bool = True,
     index_with_surrogate_quantum_number: bool = False,
     expand_dims: bool = True,
-    flatten: bool = True,
+    flatten: bool | None = None,
     concat: Literal[True] = ...,
 ) -> Array: ...
 
@@ -191,7 +191,8 @@ def harmonics(
         Note that the values will not be repeated
         therefore the computational cost will be the same
     flatten : bool, optional
-        Whether to flatten the result, by default False
+        Whether to flatten the result, by default None
+        If None, True iff concat is True.
     concat : bool, optional
         Whether to concatenate the results, by default True
 

@@ -2,9 +2,9 @@ import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
 
-from ultrasphere.coordinates import SphericalCoordinates, TEuclidean, TSpherical
-from ultrasphere.creation import c_spherical, hopf, random
-from sph_harm._core._flatten import index_array_harmonics_all
+from ultrasphere import SphericalCoordinates
+from ultrasphere import c_spherical, hopf, random
+from sph_harm._core._flatten import _index_array_harmonics_all
 
 
 @pytest.mark.parametrize(
@@ -17,13 +17,13 @@ from sph_harm._core._flatten import index_array_harmonics_all
     ],
 )
 @pytest.mark.parametrize("n_end", [4, 7])
-def test_index_array_harmonics_all(
+def test_index_array_harmonics_all[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean], n_end: int, xp: ArrayNamespaceFull
 ) -> None:
-    iall_concat = index_array_harmonics_all(
+    iall_concat = _index_array_harmonics_all(
         c, n_end=n_end, include_negative_m=False, expand_dims=True, as_array=True, xp=xp
     )
-    iall = index_array_harmonics_all(
+    iall = _index_array_harmonics_all(
         c,
         n_end=n_end,
         include_negative_m=False,

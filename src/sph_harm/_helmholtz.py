@@ -7,7 +7,7 @@ from shift_nth_row_n_steps._torch_like import create_slice
 
 from ultrasphere import SphericalCoordinates
 from ._core._assume import assume_n_end_and_include_negative_m_from_harmonics
-from ._core._flatten import index_array_harmonics
+from ._core._flatten import _index_array_harmonics
 from ultrasphere.special import szv
 
 
@@ -100,7 +100,7 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
     n_end, include_negative_m = assume_n_end_and_include_negative_m_from_harmonics(
         c, harmonics
     )
-    n = index_array_harmonics(
+    n = _index_array_harmonics(
         c, c.root, n_end=n_end, include_negative_m=include_negative_m, xp=xp
     )[(None,) * spherical["r"].ndim + (slice(None),)]
     kr = k * spherical["r"]

@@ -8,7 +8,7 @@ from ultrasphere import SphericalCoordinates
 from ._expansion import (
     expand,
 )
-from ._core._flatten import index_array_harmonics
+from ._core._flatten import _index_array_harmonics
 from ._core import concat_harmonics, expand_dims_harmonics
 from ._helmholtz import harmonics_regular_singular
 
@@ -58,10 +58,10 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
     """
     xp = array_namespace(*[euclidean[k] for k in c.e_nodes])
     _, k = xp.broadcast_arrays(euclidean[c.e_nodes[0]], k)
-    n = index_array_harmonics(c, c.root, n_end=n_end, xp=xp, expand_dims=True)[
+    n = _index_array_harmonics(c, c.root, n_end=n_end, xp=xp, expand_dims=True)[
         (...,) + (None,) * c.s_ndim
     ]
-    ns = index_array_harmonics(c, c.root, n_end=n_end_add, xp=xp, expand_dims=True)[
+    ns = _index_array_harmonics(c, c.root, n_end=n_end_add, xp=xp, expand_dims=True)[
         (None,) * c.s_ndim + (...,)
     ]
 
@@ -177,9 +177,9 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
 
     """
     if analytic:
-        n1 = index_array_harmonics(c, c.root, n_end=n_end_1, expand_dims=True, xp=xp)
-        n2 = index_array_harmonics(c, c.root, n_end=n_end_2, expand_dims=True, xp=xp)
-        n3 = index_array_harmonics(
+        n1 = _index_array_harmonics(c, c.root, n_end=n_end_1, expand_dims=True, xp=xp)
+        n2 = _index_array_harmonics(c, c.root, n_end=n_end_2, expand_dims=True, xp=xp)
+        n3 = _index_array_harmonics(
             c, c.root, n_end=n_end_1 + n_end_2 - 1, expand_dims=True, xp=xp
         )
         if c.e_ndim == 2:
@@ -199,13 +199,13 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
             from py3nj import wigner3j
 
             another_node = (set(c.s_nodes) - {c.root}).pop()
-            m1 = index_array_harmonics(
+            m1 = _index_array_harmonics(
                 c, another_node, n_end=n_end_1, expand_dims=True, xp=xp
             )
-            m2 = index_array_harmonics(
+            m2 = _index_array_harmonics(
                 c, another_node, n_end=n_end_2, expand_dims=True, xp=xp
             )
-            m3 = index_array_harmonics(
+            m3 = _index_array_harmonics(
                 c, another_node, n_end=n_end_1 + n_end_2 - 1, expand_dims=True, xp=xp
             )
             n1 = n1[(...,) + (None,) * 4]
@@ -351,13 +351,13 @@ def harmonics_translation_coef_using_triplet[TEuclidean, TSpherical](
     """
     xp = array_namespace(*[spherical[k] for k in c.s_nodes])
     # [user1,...,userM,n1,...,nN,nsummed1,...,nsummedN,ntemp1,...,ntempN]
-    n = index_array_harmonics(c, c.root, n_end=n_end, expand_dims=True, xp=xp)[
+    n = _index_array_harmonics(c, c.root, n_end=n_end, expand_dims=True, xp=xp)[
         (...,) + (None,) * (2 * c.s_ndim)
     ]
-    ns = index_array_harmonics(c, c.root, n_end=n_end_add, expand_dims=True, xp=xp)[
+    ns = _index_array_harmonics(c, c.root, n_end=n_end_add, expand_dims=True, xp=xp)[
         (None,) * c.s_ndim + (...,) + (None,) * c.s_ndim
     ]
-    ntemp = index_array_harmonics(
+    ntemp = _index_array_harmonics(
         c, c.root, n_end=n_end + n_end_add - 1, expand_dims=True, xp=xp
     )[(None,) * (2 * c.s_ndim) + (...,)]
 
