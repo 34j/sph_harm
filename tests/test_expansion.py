@@ -52,7 +52,7 @@ Path.mkdir(PATH, exist_ok=True)
 )
 @pytest.mark.parametrize("n", [4])
 @pytest.mark.parametrize("condon_shortley_phase", [True, False])
-def test_harmonics_orthogonal(
+def test_harmonics_orthogonal[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n: int,
     condon_shortley_phase: bool,
@@ -111,7 +111,7 @@ def test_harmonics_orthogonal(
 @pytest.mark.parametrize("n", [3, 4])
 @pytest.mark.parametrize("condon_shortley_phase", [True, False])
 @pytest.mark.parametrize("concat", [True, False])
-def test_orthogonal_expand(
+def test_orthogonal_expand[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n: int,
     condon_shortley_phase: bool,
@@ -179,7 +179,7 @@ def test_orthogonal_expand(
     ],
 )
 @pytest.mark.parametrize("condon_shortley_phase", [True, False])
-def test_approximate(
+def test_approximate[TSpherical, TEuclidean](
     name: str,
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
@@ -238,7 +238,7 @@ def test_approximate(
     "concat, expand_dims", [(True, True), (False, False), (False, True)]
 )
 @pytest.mark.parametrize("type", ["j"])  # , "y", "h1", "h2"])
-def test_harmonics_regular_singular_j_expansion(
+def test_harmonics_regular_singular_j_expansion[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n: int,
     concat: bool,
@@ -312,7 +312,7 @@ def test_harmonics_regular_singular_j_expansion(
     ],
 )
 @pytest.mark.parametrize("n_end", [5])
-def test_addition_theorem_same_x(
+def test_addition_theorem_same_x[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean], n_end: int, xp: ArrayNamespaceFull
 ) -> None:
     """
@@ -355,7 +355,7 @@ def test_addition_theorem_same_x(
 )
 @pytest.mark.parametrize("n_end", [12])
 @pytest.mark.parametrize("type", ["legendre", "gegenbauer", "gegenbauer-cohl"])
-def test_addition_theorem(
+def test_addition_theorem[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     type: Literal["legendre", "gegenbauer", "gegenbauer-cohl"],
@@ -446,7 +446,7 @@ def test_addition_theorem(
 @pytest.mark.parametrize("n_end, n_end_add", [(4, 14)])
 @pytest.mark.parametrize("condon_shortley_phase", [False])
 @pytest.mark.parametrize("type", ["regular", "singular"])
-def test_harmonics_translation_coef(
+def test_harmonics_translation_coef[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     n_end_add: int,
@@ -597,7 +597,7 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
 @pytest.mark.parametrize("condon_shortley_phase", [False])
 @pytest.mark.parametrize("conj_1", [True, False])
 @pytest.mark.parametrize("conj_2", [True, False])
-def test_harmonics_twins_expansion(
+def test_harmonics_twins_expansion[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     condon_shortley_phase: bool,
     n_end: int,
@@ -643,7 +643,7 @@ def test_harmonics_twins_expansion(
     "from_,to_",
     [("regular", "regular"), ("singular", "singular"), ("regular", "singular")],
 )
-def test_harmonics_translation_coef_using_triplet(
+def test_harmonics_translation_coef_using_triplet[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     n_end_add: int,
@@ -768,7 +768,7 @@ def test_harmonics_translation_coef_using_triplet(
     ],
 )
 @pytest.mark.parametrize("n_end", [4, 7])
-def test_flatten_mask_harmonics(
+def test_flatten_mask_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean], n_end: int, xp: ArrayNamespaceFull
 ) -> None:
     points = roots(c, n=n_end, expand_dims_x=True, xp=xp)[0]
@@ -807,7 +807,7 @@ def test_flatten_mask_harmonics(
         hopf(2),
     ],
 )
-def test_flatten_unflatten_harmonics(
+def test_flatten_unflatten_harmonics[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean], xp: ArrayNamespaceFull
 ) -> None:
     n_end = 4
