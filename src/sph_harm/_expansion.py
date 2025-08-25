@@ -10,7 +10,7 @@ from ultrasphere import (
 )
 
 from ._core import assume_n_end_and_include_negative_m_from_harmonics
-from ._core import harmonics as harmonics__
+from ._core import harmonics
 from ._core._eigenfunction import ndim_harmonics as ndim_harmonics_
 
 
@@ -167,7 +167,7 @@ def expand[TEuclidean, TSpherical](
             val = f
 
         # calculate harmonics
-        harmonics = harmonics__(
+        Y = harmonics(
             c,
             xs,
             n_end=n_end,
@@ -191,11 +191,11 @@ def expand[TEuclidean, TSpherical](
                 # val: theta(node),u1,...,uM
                 # harmonics: theta(node),harm1,...,harmNnode
                 # result: theta(node),u1,...,uM,harm1,...,harmNnode
-                xpx.broadcast_shapes(value.shape[:1], harmonics[node].shape[:1])
+                xpx.broadcast_shapes(value.shape[:1], Y[node].shape[:1])
                 ndim_val = value.ndim - 1
                 ndim_harm = ndim_harmonics_(c, node)
                 value = value[(...,) + (None,) * (ndim_harm)]
-                harm = harmonics[node][
+                harm = Y[node][
                     (slice(None),) + (None,) * ndim_val + (slice(None),) * ndim_harm
                 ]
                 result[node] = value * xp.conj(harm)
@@ -209,13 +209,13 @@ def expand[TEuclidean, TSpherical](
             # val: theta1,...,thetaN,u1,...,uM
             # harmonics: theta1,...,thetaN,harm
             # res: theta1,...,thetaN,u1,...,uM,harm
-            xpx.broadcast_shapes(val.shape[: c.s_ndim], harmonics.shape[: c.s_ndim])
+            xpx.broadcast_shapes(val.shape[: c.s_ndim], Y.shape[: c.s_ndim])
             ndim_val = val.ndim - c.s_ndim
             val = val[..., None]
-            harmonics = harmonics[
+            Y = Y[
                 (slice(None),) * c.s_ndim + (None,) * ndim_val + (slice(None),)
             ]
-            result = val * xp.conj(harmonics)
+            result = val * xp.conj(Y)
 
         return result
 
@@ -299,7 +299,7 @@ def expand_evaluate[TEuclidean, TSpherical](
         else array_namespace(expansion)
     )
     n_end, _ = assume_n_end_and_include_negative_m_from_harmonics(c, expansion)
-    harmonics = harmonics__(
+    Y = harmonics(
         c,
         spherical,
         n_end=n_end,
@@ -312,23 +312,23 @@ def expand_evaluate[TEuclidean, TSpherical](
         result: dict[TSpherical, Array] = {}
         for node in c.s_nodes:
             expansion_ = expansion[node]
-            harmonics_ = harmonics[node]
+            Y_ = Y[node]
             # expansion: f1,...,fL,harm1,...,harmNnode
             # harmonics: u1,...,uM,harm1,...,harmNnode
             # result: u1,...,uM,f1,...,fL
             ndim_harmonics = ndim_harmonics_(c, node)
             ndim_expansion = expansion_.ndim - ndim_harmonics
-            ndim_extra_harmonics = harmonics_.ndim - ndim_harmonics
-            expansion_ = harmonics_[
+            ndim_extra_harmonics = Y_.ndim - ndim_harmonics
+            expansion_ = Y_[
                 (None,) * (ndim_extra_harmonics)
                 + (slice(None),) * (ndim_expansion + ndim_harmonics)
             ]
-            harmonics = harmonics_[
+            Y_ = Y_[
                 (slice(None),) * ndim_extra_harmonics
                 + (None,) * ndim_expansion
                 + (slice(None),) * ndim_harmonics
             ]
-            result_ = harmonics_ * expansion_
+            result_ = Y_ * expansion_
             for _ in range(ndim_harmonics):
                 result_ = xp.sum(result_, axis=-1)
             result[node] = result
@@ -339,14 +339,14 @@ def expand_evaluate[TEuclidean, TSpherical](
     # harmonics: u1,...,uM,harm
     # result: u1,...,uM,f1,...,fL
     ndim_expansion = expansion.ndim - 1
-    ndim_extra_harmonics = harmonics.ndim - 1
+    ndim_extra_harmonics = Y.ndim - 1
     expansion = expansion[
         (None,) * (ndim_extra_harmonics) + (slice(None),) * (ndim_expansion + 1)
     ]
-    harmonics = harmonics[
+    Y = Y[
         (slice(None),) * ndim_extra_harmonics
         + (None,) * ndim_expansion
         + (slice(None),)
     ]
-    result = xp.sum(harmonics * expansion, axis=-1)
+    result = xp.sum(Y * expansion, axis=-1)
     return result

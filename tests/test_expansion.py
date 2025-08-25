@@ -13,6 +13,7 @@ from ultrasphere import (
     from_branching_types,
     hopf,
     random_ball,
+    roots,
     standard,
 )
 
@@ -117,8 +118,8 @@ def test_approximate[TSpherical, TEuclidean](
         # return xp.ones_like(x[0])
         return xp.exp(1j * xp.einsum("v,v...->...", xp.astype(k, x.dtype), x))
 
-    # spherical, _ = roots(c, 1, expand_dims_x=True, xp=xp)
-    spherical = c.from_euclidean(random_ball(c, shape=(2, 3, 4), xp=xp, surface=True))
+    spherical, _ = roots(c, 1, expand_dims_x=True, xp=xp)
+    # spherical = c.from_euclidean(random_ball(c, shape=(2, 3, 4), xp=xp, surface=True))
     expected = f(spherical)
     error = {}
     expansion = expand(
@@ -133,12 +134,14 @@ def test_approximate[TSpherical, TEuclidean](
     for n_end_c in np.linspace(1, n_end, 5):
         n_end_c = int(n_end_c)
         expansion_cut = expand_cut(c, expansion, n_end_c)
+        print(expansion_cut)
         approx = expand_evaluate(
             c,
             expansion_cut,
             spherical,
             condon_shortley_phase=condon_shortley_phase,
         )
+        print(approx, expected)
         error[n_end_c] = xp.mean(xp.abs(approx - expected))
     fig, ax = plt.subplots()
     ax.plot(list(error.keys()), list(error.values()))

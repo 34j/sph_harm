@@ -32,7 +32,7 @@ dependencies = [
   "rich>=10",
   "shift-nth-row-n-steps>=1.0.0",
   "typer>=0.15,<1",
-  "ultrasphere>=1.1.2",
+  "ultrasphere>=1.1.5",
 ]
 urls."Bug Tracker" = "https://github.com/34j/sph_harm/issues"
 urls.Changelog = "https://github.com/34j/sph_harm/blob/main/CHANGELOG.md"
