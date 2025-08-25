@@ -41,6 +41,7 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
     ----------
     euclidean : Mapping[TEuclidean, Array]
         The translation vector in euclidean coordinates.
+        Each array must have the same shape (...,).
     n_end : int
         The maximum degree of the harmonic.
     n_end_add : int
@@ -53,32 +54,32 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
     Returns
     -------
     Array
-        The translation coefficients of `2 * c.s_ndim` dimensions.
-        [-c.s_ndim,-1] dimensions are to be
-        summed over with the elementary solutions
+        The translation coefficients of shape (..., N, N).
+        Axis -1 is to be summed over with the elementary solutions
         to get translated elementary solution
-        which quantum number is [-2*c.s_ndim,-c.s_ndim-1] indices.
+        which quantum number is axis -2 indices.
 
     """
     xp = array_namespace(*[euclidean[k] for k in c.e_nodes])
     _, k = xp.broadcast_arrays(euclidean[c.e_nodes[0]], k)
-    n = _index_array_harmonics(c, c.root, n_end=n_end, xp=xp, expand_dims=True)[
-        (...,) + (None,) * c.s_ndim
+    n = index_array_harmonics(c, c.root, n_end=n_end, xp=xp, expand_dims=True, flatten=True)[
+        :, None
     ]
-    ns = _index_array_harmonics(c, c.root, n_end=n_end_add, xp=xp, expand_dims=True)[
-        (None,) * c.s_ndim + (...,)
+    ns = index_array_harmonics(c, c.root, n_end=n_end_add, xp=xp, expand_dims=True, flatten=True)[
+        None, :
     ]
 
     def to_expand(spherical: Mapping[TSpherical, Array]) -> Array:
-        # returns [spherical1,...,sphericalN,user1,...,userM,n1,...,nN]
-        # [spherical1,...,sphericalN,n1,...,nN]
+        # returns [spherical1,...,sphericalN,user1,...,userM,harmn]
+        # [spherical1,...,sphericalN,harmn]
         Y = harmonics(
             c,
             spherical,
-            n_end,
+            n_end=n_end,
             condon_shortley_phase=condon_shortley_phase,
             expand_dims=True,
             concat=True,
+            flatten=True
         )
         x = c.to_euclidean(spherical)
         ndim_user = euclidean[c.e_nodes[0]].ndim
@@ -104,15 +105,15 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
             Y[
                 (slice(None),) * ndim_spherical
                 + (None,) * ndim_user
-                + (slice(None),) * ndim_spherical
+                + (slice(None),)
             ]
             * e[
-                (slice(None),) * (ndim_spherical + ndim_user) + (None,) * ndim_spherical
+                (slice(None),) * (ndim_spherical + ndim_user) + (None,)
             ]
         )
         return result
 
-    # returns [user1,...,userM,n1,...,nN,np1,...,npN]
+    # returns [user1,...,userM,harmn,harmn']
     return (-1j) ** (n - ns) * expand(
         c,
         to_expand,
@@ -384,7 +385,7 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
             )
         return _harmonics_translation_coef_plane_wave(
             c,
-            spherical,
+            euclidean=c.to_euclidean(spherical, as_array=True),
             n_end=n_end,
             n_end_add=n_end_add,
             condon_shortley_phase=condon_shortley_phase,
