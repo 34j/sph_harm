@@ -95,8 +95,9 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
     "name, c, n_end",
     [
         ("spherical", c_spherical(), 5),
-        ("standard-3'", from_branching_types("bpa"), 10),
-        ("standard-4", standard(3), 7),
+        ("standard-2", standard(2), 7),
+        ("standard-2'", from_branching_types("bpa"), 10),
+        ("standard-3", standard(3), 6),
         ("hoph-2", hopf(2), 6),
         # ("hoph-3", hopf(3), 3),
         # ("random-1", random(1), 30),
@@ -115,11 +116,10 @@ def test_approximate[TSpherical, TEuclidean](
 
     def f(s: Mapping[TSpherical, Array]) -> Array:
         x = c.to_euclidean(s, as_array=True)
-        # return xp.ones_like(x[0])
-        return xp.exp(1j * xp.einsum("v,v...->...", xp.astype(k, x.dtype), x))
+        # k is complex
+        return xp.exp(1j * xp.vecdot(x, xp.astype(k, x.dtype)[(slice(None), ) + (None,) * (x.ndim - 1)], axis=0))
 
     spherical, _ = roots(c, 1, expand_dims_x=True, xp=xp)
-    # spherical = c.from_euclidean(random_ball(c, shape=(2, 3, 4), xp=xp, surface=True))
     expected = f(spherical)
     error = {}
     expansion = expand(
@@ -134,14 +134,12 @@ def test_approximate[TSpherical, TEuclidean](
     for n_end_c in np.linspace(1, n_end, 5):
         n_end_c = int(n_end_c)
         expansion_cut = expand_cut(c, expansion, n_end_c)
-        print(expansion_cut)
         approx = expand_evaluate(
             c,
             expansion_cut,
             spherical,
             condon_shortley_phase=condon_shortley_phase,
         )
-        print(approx, expected)
         error[n_end_c] = xp.mean(xp.abs(approx - expected))
     fig, ax = plt.subplots()
     ax.plot(list(error.keys()), list(error.values()))

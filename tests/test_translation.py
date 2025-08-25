@@ -162,9 +162,8 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         condon_shortley_phase=condon_shortley_phase,
         is_type_same=from_ == to_,
     )
-    actual = xp.vecdot(
-        x_RS[..., None, :],
-        coef,
+    # cannot be replaced with vecdot because both is complex
+    actual = xp.sum(x_RS[..., None, :] * coef,
         axis=-1,
     )
     # wrong_idx = xp.abs(actual - expected) > 1e-3

@@ -1372,7 +1372,7 @@ requires-dist = [
     { name = "rich", specifier = ">=10" },
     { name = "shift-nth-row-n-steps", specifier = ">=1.0.0" },
     { name = "typer", specifier = ">=0.15,<1" },
-    { name = "ultrasphere", specifier = ">=1.1.5" },
+    { name = "ultrasphere", specifier = ">=1.1.6" },
 ]
 
 [package.metadata.requires-dev]
@@ -1636,7 +1636,7 @@ wheels = [
 
 [[package]]
 name = "ultrasphere"
-version = "1.1.5"
+version = "1.1.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aquarel" },
@@ -1651,9 +1651,9 @@ dependencies = [
     { name = "typer" },
     { name = "types-array-api" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/f5/09daf36cf77dc3aab1046a5b9fdc3effe673b8c75731c1af5d4a734d2229/ultrasphere-1.1.5.tar.gz", hash = "sha256:0190971b81a620ce6b3db6dcbb23e8a2f29cf7d9e3ffd56272bbadc6ca0a50c2", size = 23032, upload-time = "2025-08-25T02:18:20.66Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fb/b8/37c5c62261c17b44ea0d050aafc581bf7f8f43570caa8cb527b6546009c1/ultrasphere-1.1.6.tar.gz", hash = "sha256:33cfa8aee8427d58a04c31291a8d4b9bfb343f05c8929dc77ef4d16fd6da1ee5", size = 23050, upload-time = "2025-08-25T05:00:09.247Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/02/5c/ee0bb817a886295d0da3b45fe6164d593b5f8d3831b927b728307dac72c9/ultrasphere-1.1.5-py3-none-any.whl", hash = "sha256:547a38e661251185c198acebab792f26f7ae62314d4342e9012504afb9468ed1", size = 20560, upload-time = "2025-08-25T02:18:19.281Z" },
+    { url = "https://files.pythonhosted.org/packages/20/ef/1092ab269471ff301e1eeee6ed99251cce10196d6495c7bbca17eddfa289/ultrasphere-1.1.6-py3-none-any.whl", hash = "sha256:67565a6b7c8af2dd573c176dd5619e14eb6dce7865682f6721dbb3f633f087aa", size = 20563, upload-time = "2025-08-25T05:00:07.735Z" },
 ]
 
 [[package]]
