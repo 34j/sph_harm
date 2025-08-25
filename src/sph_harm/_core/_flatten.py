@@ -10,6 +10,7 @@ from ultrasphere import (
     SphericalCoordinates,
     get_child,
 )
+import array_api_extra as xpx
 
 from ._assume import assume_n_end_and_include_negative_m_from_harmonics
 
@@ -226,6 +227,11 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
                 - xp.abs(index_arrays[get_child(c.G, node, "cos")])
             )
             mask = mask & (value % 2 == 0) & (value >= 0)
+
+    shape = xpx.broadcast_shapes(
+        *[index_array.shape for index_array in index_arrays.values()]
+    )
+    mask = xp.broadcast_to(mask, shape)
     return mask
 
 
@@ -257,9 +263,10 @@ def flatten_harmonics[TSpherical, TEuclidean](
     mask = flatten_mask_harmonics(
         c, n_end=n_end, xp=xp, include_negative_m=include_negative_m
     )
+    print(mask.shape)
     harmonics = xp.broadcast_to(
         harmonics,
-        (*harmonics.shape[: -c.s_ndim], *mask.shape),
+        (*harmonics.shape[: -mask.ndim], *mask.shape),
     )
     return harmonics[..., mask]
 
