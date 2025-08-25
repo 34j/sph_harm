@@ -359,18 +359,29 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
         which quantum number is [-2*c.s_ndim,-c.s_ndim-1] indices.
 
     """
+    if method is None:
+        if c.branching_types_expression_str == "ba":
+            method = "gumerov"
+        elif is_type_same:
+            method = "plane_wave"
+        else:
+            method = "triplet"
     if method == "gumerov":
         if c.branching_types_expression_str == "ba":
             return translational_coefficients(
                 k * spherical["r"],
                 spherical[c.root],
-                spherical[get_child(c.G, c.root, "cos")],
+                spherical[get_child(c.G, c.root, "sin")],
                 n_end=n_end,
                 same=is_type_same,
             )
         else:
             raise NotImplementedError()
     elif method == "plane_wave":
+        if not is_type_same:
+            raise NotImplementedError(
+                "plane_wave method only supports is_type_same=True"
+            )
         return _harmonics_translation_coef_plane_wave(
             c,
             spherical,
@@ -379,7 +390,7 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
             condon_shortley_phase=condon_shortley_phase,
             k=k,
         )
-    elif method == "triplet" or method is None:
+    elif method == "triplet":
         return _harmonics_translation_coef_triplet(
             c,
             spherical,

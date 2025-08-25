@@ -87,6 +87,10 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
     "from_,to_",
     [("regular", "regular"), ("singular", "singular"), ("regular", "singular")],
 )
+@pytest.mark.parametrize(
+    "method",
+    ["gumerov", "plane_wave", "triplet", None],
+)
 def test_harmonics_translation_coef[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
@@ -95,7 +99,12 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
     from_: Literal["regular", "singular"],
     to_: Literal["regular", "singular"],
     xp: ArrayNamespaceFull,
+    method: Literal["gumerov", "plane_wave", "triplet"],
 ) -> None:
+    if method == "gumerov" and c.branching_types_expression_str != "ba":
+        pytest.skip("gumerov method only supports ba branching type")
+    if method == "plane_wave" and from_ != to_:
+        pytest.skip("plane_wave method only supports from_=to_")
     shape = ()
     # get x, t, y := x + t
     x = random_points(c, shape=shape, xp=xp)
@@ -158,9 +167,9 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         coef,
         axis=-1,
     )
-    wrong_idx = xp.abs(actual - expected) > 1e-3
-    if wrong_idx.any():
-        print(actual[wrong_idx], expected[wrong_idx], wrong_idx.nonzero(as_tuple=False))
+    # wrong_idx = xp.abs(actual - expected) > 1e-3
+    # if wrong_idx.any():
+    #     print(actual[wrong_idx], expected[wrong_idx], wrong_idx.nonzero(as_tuple=False))
     if (from_, to_) == ("singular", "singular"):
         pytest.skip("singular case does not converge in real world computation")
     assert xp.all(xpx.isclose(actual, expected, rtol=1e-3, atol=1e-3))
