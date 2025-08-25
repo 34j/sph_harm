@@ -27,7 +27,6 @@ def test_match_scipy(n_end: int, xp: ArrayNamespaceFull, k: Array) -> None:
         k * to_device(x_spherical["r"][None, None, ...], "cpu"),
     )
     expected = xp.moveaxis(xp.asarray(expected), (0, 1), (-2, -1))
-    print(expected.shape)
     expected = flatten_harmonics(
         c,
         expected,

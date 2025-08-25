@@ -171,9 +171,6 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         x_RS[..., None, :] * coef,
         axis=-1,
     )
-    # wrong_idx = xp.abs(actual - expected) > 1e-3
-    # if wrong_idx.any():
-    #     print(actual[wrong_idx], expected[wrong_idx], wrong_idx.nonzero(as_tuple=False))
     if (from_, to_) == ("singular", "singular"):
         pytest.skip("singular case does not converge in real world computation")
     assert xp.all(xpx.isclose(actual, expected, rtol=1e-3, atol=1e-3))

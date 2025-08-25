@@ -8,7 +8,7 @@ from .._ndim import harm_n_ndim_le
 
 def assume_n_end_and_include_negative_m_from_harmonics[TEuclidean, TSpherical](
     c: SphericalCoordinates[TSpherical, TEuclidean],
-    expansion: Mapping[TSpherical, Array] | Array,
+    expansion: Mapping[TSpherical, Array] | Array | tuple[int, ...],
     /,
     *,
     flatten: bool = True,
@@ -18,7 +18,7 @@ def assume_n_end_and_include_negative_m_from_harmonics[TEuclidean, TSpherical](
 
     Parameters
     ----------
-    expansion : Mapping[TSpherical, Array] | Array
+    expansion : Mapping[TSpherical, Array] | Array | tuple[int, ...]
         The expansion coefficients.
         If mapping, assume that the expansion is not expanded.
 
@@ -48,6 +48,8 @@ def assume_n_end_and_include_negative_m_from_harmonics[TEuclidean, TSpherical](
             return 0, False
         if is_mapping:
             sizes = [expansion[k].shape[-1] for k in c.s_nodes]
+        elif isinstance(expansion, tuple):
+            sizes = expansion[-c.s_ndim :]
         else:
             sizes = expansion.shape[-c.s_ndim :]  # type: ignore
         n_end = (max(sizes) + 1) // 2

@@ -261,7 +261,9 @@ def flatten_harmonics[TSpherical, TEuclidean](
     xp = array_namespace(harmonics)
     if n_end is None or include_negative_m is None:
         n_end, include_negative_m = assume_n_end_and_include_negative_m_from_harmonics(
-            c, harmonics, flatten=False
+            c,
+            harmonics.shape if axis_end == -1 else harmonics.shape[: axis_end + 1],
+            flatten=False,
         )
     mask = flatten_mask_harmonics(
         c, n_end=n_end, xp=xp, include_negative_m=include_negative_m
