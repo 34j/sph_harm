@@ -12,7 +12,6 @@ from ultrasphere import (
     c_spherical,
     from_branching_types,
     hopf,
-    random_ball,
     roots,
     standard,
 )
@@ -117,7 +116,14 @@ def test_approximate[TSpherical, TEuclidean](
     def f(s: Mapping[TSpherical, Array]) -> Array:
         x = c.to_euclidean(s, as_array=True)
         # k is complex
-        return xp.exp(1j * xp.vecdot(x, xp.astype(k, x.dtype)[(slice(None), ) + (None,) * (x.ndim - 1)], axis=0))
+        return xp.exp(
+            1j
+            * xp.vecdot(
+                x,
+                xp.astype(k, x.dtype)[(slice(None),) + (None,) * (x.ndim - 1)],
+                axis=0,
+            )
+        )
 
     spherical, _ = roots(c, 1, expand_dims_x=True, xp=xp)
     expected = f(spherical)

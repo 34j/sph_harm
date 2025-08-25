@@ -1,21 +1,18 @@
-from collections.abc import Mapping
-
 import array_api_extra as xpx
+import numpy as np
 import pytest
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import to_device
-from scipy.special import sph_harm_y_all
-from ultrasphere import SphericalCoordinates, c_spherical, hopf, integrate, standard
+from scipy.special import sph_harm_y_all, spherical_jn
+from ultrasphere import c_spherical
 
-from sph_harm._core import harmonics
 from sph_harm._core._flatten import flatten_harmonics
-from sph_harm._ndim import harm_n_ndim_le
 from sph_harm._helmholtz import harmonics_regular_singular
-from scipy.special import spherical_jn
-import numpy as np
+
+
 @pytest.mark.parametrize("n_end", [1, 2, 12])  # scipy does not support n_end == 0
 @pytest.mark.parametrize("k", [1, 2])
-def test_match_scipy(n_end: int, xp: ArrayNamespaceFull, k: Array) -> None:    
+def test_match_scipy(n_end: int, xp: ArrayNamespaceFull, k: Array) -> None:
     c = c_spherical()
     shape = ()
     x = xp.random.random_uniform(low=-1, high=1, shape=(c.e_ndim, *shape))
@@ -25,7 +22,10 @@ def test_match_scipy(n_end: int, xp: ArrayNamespaceFull, k: Array) -> None:
         n_end - 1,
         to_device(x_spherical["theta"], "cpu"),
         to_device(x_spherical["phi"], "cpu"),
-    ) * spherical_jn(np.arange(n_end)[:, None, ...], k * to_device(x_spherical["r"][None, None, ...], "cpu"))
+    ) * spherical_jn(
+        np.arange(n_end)[:, None, ...],
+        k * to_device(x_spherical["r"][None, None, ...], "cpu"),
+    )
     expected = xp.moveaxis(xp.asarray(expected), (0, 1), (-2, -1))
     print(expected.shape)
     expected = flatten_harmonics(
@@ -34,13 +34,13 @@ def test_match_scipy(n_end: int, xp: ArrayNamespaceFull, k: Array) -> None:
     )
     actual = harmonics_regular_singular(
         c,
-        x_spherical, 
+        x_spherical,
         n_end=n_end,
         condon_shortley_phase=True,
         concat=True,
         expand_dims=True,
         flatten=True,
         type="regular",
-        k=k
+        k=k,
     )
     assert xp.all(xpx.isclose(actual, expected, rtol=1e-3, atol=1e-3))

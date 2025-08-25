@@ -8,7 +8,6 @@ from ultrasphere import SphericalCoordinates, get_child
 
 from ._core import concat_harmonics, expand_dims_harmonics
 from ._core._flatten import (
-    _index_array_harmonics,
     flatten_harmonics,
     index_array_harmonics,
 )
@@ -62,12 +61,12 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
     """
     xp = array_namespace(*[euclidean[k] for k in c.e_nodes])
     _, k = xp.broadcast_arrays(euclidean[c.e_nodes[0]], k)
-    n = index_array_harmonics(c, c.root, n_end=n_end, xp=xp, expand_dims=True, flatten=True)[
-        :, None
-    ]
-    ns = index_array_harmonics(c, c.root, n_end=n_end_add, xp=xp, expand_dims=True, flatten=True)[
-        None, :
-    ]
+    n = index_array_harmonics(
+        c, c.root, n_end=n_end, xp=xp, expand_dims=True, flatten=True
+    )[:, None]
+    ns = index_array_harmonics(
+        c, c.root, n_end=n_end_add, xp=xp, expand_dims=True, flatten=True
+    )[None, :]
 
     def to_expand(spherical: Mapping[TSpherical, Array]) -> Array:
         # returns [spherical1,...,sphericalN,user1,...,userM,harmn]
@@ -79,7 +78,7 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
             condon_shortley_phase=condon_shortley_phase,
             expand_dims=True,
             concat=True,
-            flatten=True
+            flatten=True,
         )
         x = c.to_euclidean(spherical)
         ndim_user = euclidean[c.e_nodes[0]].ndim
@@ -102,14 +101,8 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
         # [spherical1,...,sphericalN,user1,...,userM]
         e = xp.exp(1j * k[(None,) * ndim_spherical + (slice(None),) * ndim_user] * ip)
         result = (
-            Y[
-                (slice(None),) * ndim_spherical
-                + (None,) * ndim_user
-                + (slice(None),)
-            ]
-            * e[
-                (slice(None),) * (ndim_spherical + ndim_user) + (None,)
-            ]
+            Y[(slice(None),) * ndim_spherical + (None,) * ndim_user + (slice(None),)]
+            * e[(slice(None),) * (ndim_spherical + ndim_user) + (None,)]
         )
         return result
 
@@ -188,7 +181,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
             expand_dims=True,
             concat=False,
         )
-        Y1 = {k: v[..., :, None] for k, v in Y1.items()}
+        Y1 = {k: v[(...,) + (None,) * c.s_ndim] for k, v in Y1.items()}
         if conj_1:
             Y1 = {k: xp.conj(v) for k, v in Y1.items()}
         Y2 = harmonics(
@@ -199,32 +192,34 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
             expand_dims=True,
             concat=False,
         )
-        Y2 = {k: v[..., None, :] for k, v in Y2.items()}
+        Y2 = {
+            k: v[(...,) + (None,) * c.s_ndim + (slice(None),) * c.s_ndim]
+            for k, v in Y2.items()
+        }
         if conj_2:
             Y2 = {k: xp.conj(v) for k, v in Y2.items()}
         return {k: Y1[k] * Y2[k] for k in c.s_nodes}
 
     # returns [user1,...,userM,n1,...,nN,np1,...,npN]
-    return xp.real(
-        flatten_harmonics(
-            c,
-            concat_harmonics(
-                c,
-                expand_dims_harmonics(
-                    c,
-                    expand(
-                        c,
-                        to_expand,
-                        does_f_support_separation_of_variables=True,
-                        n=n_end_1 + n_end_2 - 1,  # at least n_end + 2
-                        n_end=n_end_1 + n_end_2 - 1,
-                        condon_shortley_phase=condon_shortley_phase,
-                        xp=xp,
-                    ),
-                ),
-            ),
-        )
+    result = expand(
+        c,
+        to_expand,
+        does_f_support_separation_of_variables=True,
+        n=n_end_1 + n_end_2 - 1,  # at least n_end + 2
+        n_end=n_end_1 + n_end_2 - 1,
+        condon_shortley_phase=condon_shortley_phase,
+        xp=xp,
     )
+    result = expand_dims_harmonics(c, result)
+    result = concat_harmonics(c, result)
+    result = flatten_harmonics(c, result)
+    result = flatten_harmonics(
+        c, result, axis_end=-2, n_end=n_end_2, include_negative_m=True
+    )
+    result = flatten_harmonics(
+        c, result, axis_end=-3, n_end=n_end_1, include_negative_m=True
+    )
+    return result
 
 
 def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
@@ -296,6 +291,19 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
         concat=True,
         k=k,
         type="regular" if is_type_same else "singular",
+        flatten=True,
+    )
+    print(
+        harmonics_twins_expansion(
+            c,
+            n_end_1=n_end,
+            n_end_2=n_end_add,
+            condon_shortley_phase=condon_shortley_phase,
+            conj_1=False,
+            conj_2=True,
+            xp=xp,
+        ).shape,
+        t_RS.shape,
     )
     return coef * xp.sum(
         (-1j) ** (n - ns - ntemp)
@@ -368,6 +376,8 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
         else:
             method = "triplet"
     if method == "gumerov":
+        if n_end != n_end_add:
+            raise ValueError("n_end must be equal to n_end_add for gumerov method.")
         if c.branching_types_expression_str == "ba":
             return translational_coefficients(
                 k * spherical["r"],

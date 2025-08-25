@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from typing import Literal, overload
 
+import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 from array_api_negative_index import to_symmetric
@@ -10,7 +11,6 @@ from ultrasphere import (
     SphericalCoordinates,
     get_child,
 )
-import array_api_extra as xpx
 
 from ._assume import assume_n_end_and_include_negative_m_from_harmonics
 
@@ -240,6 +240,7 @@ def flatten_harmonics[TSpherical, TEuclidean](
     harmonics: Array,
     n_end: int | None = None,
     include_negative_m: bool | None = None,
+    axis_end: int = -1,
 ) -> Array:
     """
     Flatten the harmonics.
@@ -255,6 +256,8 @@ def flatten_harmonics[TSpherical, TEuclidean](
         The flattened harmonics of shape (..., n_harmonics).
 
     """
+    if axis_end >= 0:
+        raise ValueError("axis_end must be negative.")
     xp = array_namespace(harmonics)
     if n_end is None or include_negative_m is None:
         n_end, include_negative_m = assume_n_end_and_include_negative_m_from_harmonics(
@@ -263,12 +266,9 @@ def flatten_harmonics[TSpherical, TEuclidean](
     mask = flatten_mask_harmonics(
         c, n_end=n_end, xp=xp, include_negative_m=include_negative_m
     )
-    print(mask.shape)
-    harmonics = xp.broadcast_to(
-        harmonics,
-        (*harmonics.shape[: -mask.ndim], *mask.shape),
-    )
-    return harmonics[..., mask]
+    shape = xpx.broadcast_shapes(harmonics.shape, mask.shape + (1,) * (-axis_end - 1))
+    harmonics = xp.broadcast_to(harmonics, shape)
+    return harmonics[(..., mask) + (slice(None),) * (-axis_end - 1)]
 
 
 def unflatten_harmonics[TSpherical, TEuclidean](

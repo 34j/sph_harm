@@ -9,8 +9,7 @@ from ultrasphere import (
     integrate,
 )
 
-from ._core import assume_n_end_and_include_negative_m_from_harmonics
-from ._core import harmonics
+from ._core import assume_n_end_and_include_negative_m_from_harmonics, harmonics
 from ._core._eigenfunction import ndim_harmonics as ndim_harmonics_
 
 
@@ -212,9 +211,7 @@ def expand[TEuclidean, TSpherical](
             xpx.broadcast_shapes(val.shape[: c.s_ndim], Y.shape[: c.s_ndim])
             ndim_val = val.ndim - c.s_ndim
             val = val[..., None]
-            Y = Y[
-                (slice(None),) * c.s_ndim + (None,) * ndim_val + (slice(None),)
-            ]
+            Y = Y[(slice(None),) * c.s_ndim + (None,) * ndim_val + (slice(None),)]
             result = val * xp.conj(Y)
 
         return result

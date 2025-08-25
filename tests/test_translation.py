@@ -10,6 +10,7 @@ from ultrasphere import (
 )
 from ultrasphere import random_ball as random_points
 
+from sph_harm._core._flatten import unflatten_harmonics
 from sph_harm._helmholtz import (
     harmonics_regular_singular,
 )
@@ -66,11 +67,14 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
             k=k,
             condon_shortley_phase=False,
             is_type_same=False,
+            method="triplet",
         )
         actual = xp.sum(
-            x_RS[(...,) + (None,) * c.s_ndim + (slice(None),) * c.s_ndim] * coef,
-            axis=tuple(range(-c.s_ndim, 0)),
+            x_RS[..., None, :] * coef,
+            axis=-1,
         )
+        expected = unflatten_harmonics(c, expected)
+        actual = unflatten_harmonics(c, actual)
         print(xp.round(expected[5, 2], decimals=6), xp.round(actual[5, 2], decimals=6))
 
 
@@ -163,7 +167,8 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         is_type_same=from_ == to_,
     )
     # cannot be replaced with vecdot because both is complex
-    actual = xp.sum(x_RS[..., None, :] * coef,
+    actual = xp.sum(
+        x_RS[..., None, :] * coef,
         axis=-1,
     )
     # wrong_idx = xp.abs(actual - expected) > 1e-3
