@@ -368,16 +368,14 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
         else:
             method = "triplet"
     if method == "gumerov":
-        if n_end != n_end_add:
-            raise ValueError("n_end must be equal to n_end_add for gumerov method.")
         if c.branching_types_expression_str == "ba":
             return translational_coefficients(
                 k * spherical["r"],
                 spherical[c.root],
                 spherical[get_child(c.G, c.root, "sin")],
-                n_end=n_end,
+                n_end=max(n_end, n_end_add),
                 same=is_type_same,
-            )
+            )[: n_end ** 2, : n_end_add ** 2]
         else:
             raise NotImplementedError()
     elif method == "plane_wave":
