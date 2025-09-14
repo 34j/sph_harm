@@ -77,11 +77,12 @@ def expand[TEuclidean, TSpherical](
     dtype: Any | None = None,
 ) -> Array | Mapping[TSpherical, Array]:
     """
-    Calculate the expansion coefficients of the function
-    over the hypersphere.
+    Calculate the expansion coefficients of the function over the hypersphere.
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     f : Callable[ [Mapping[TSpherical, Array]],
         Mapping[TSpherical, Array] | Array, ]
        | Mapping[TSpherical, Array] | Array
@@ -130,6 +131,8 @@ def expand[TEuclidean, TSpherical](
 
         If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
         (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+    xp : ArrayNamespaceFull
+        The array namespace.
     device : Any, optional
         The device, by default None
     dtype : Any, optional
@@ -166,7 +169,7 @@ def expand[TEuclidean, TSpherical](
             val = f
 
         # calculate harmonics
-        Y = harmonics(
+        Y = harmonics(  # type: ignore[call-overload]
             c,
             xs,
             n_end=n_end,
@@ -217,7 +220,7 @@ def expand[TEuclidean, TSpherical](
         return result
 
     return integrate(
-        c,  # type: ignore
+        c,
         inner,
         does_f_support_separation_of_variables,
         n,
@@ -262,6 +265,8 @@ def expand_evaluate[TEuclidean, TSpherical](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     expansion : Mapping[TSpherical, Array] | Array
         The expansion coefficients.
         If not mapping, assume that the expansion is flatten.
@@ -296,7 +301,7 @@ def expand_evaluate[TEuclidean, TSpherical](
         else array_namespace(expansion)
     )
     n_end, _ = assume_n_end_and_include_negative_m_from_harmonics(c, expansion)
-    Y = harmonics(
+    Y = harmonics(  # type: ignore[call-overload]
         c,
         spherical,
         n_end=n_end,

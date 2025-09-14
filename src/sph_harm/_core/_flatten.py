@@ -25,11 +25,12 @@ def _index_array_harmonics[TSpherical, TEuclidean](
     include_negative_m: bool = True,
 ) -> Array:
     """
-    The index of the eigenfunction
-    corresponding to the node.
+    The index of the eigenfunction corresponding to the node.
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     node : TSpherical
         The node of the spherical coordinates.
     n_end : int
@@ -38,6 +39,8 @@ def _index_array_harmonics[TSpherical, TEuclidean](
         Whether to expand dimensions, by default True
     include_negative_m : bool, optional
         Whether to include negative m values, by default True
+    xp : ArrayNamespaceFull
+        The array namespace.
 
     Returns
     -------
@@ -101,11 +104,12 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
     mask: bool = False,
 ) -> Array | Mapping[TSpherical, Array]:
     """
-    The all indices of the eigenfunction
-    corresponding to the spherical coordinates.
+    The all indices of the eigenfunction corresponding to the spherical coordinates.
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     n_end : int
         The maximum degree of the harmonic.
     include_negative_m : bool, optional
@@ -118,6 +122,8 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
     mask : bool, optional
         Whether to fill invalid quantum numbers with NaN, by default False
         Must be False if as_array is False.
+    xp : ArrayNamespaceFull
+        The array namespace.
 
     Returns
     -------
@@ -166,7 +172,7 @@ def _index_array_harmonics_all[TSpherical, TEuclidean](
             result[
                 :,
                 ~flatten_mask_harmonics(
-                    c, n_end, xp=xp, include_negative_m=include_negative_m
+                    c, n_end=n_end, xp=xp, include_negative_m=include_negative_m
                 ),
             ] = xp.nan
         return result
@@ -182,12 +188,14 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
     include_negative_m: bool = True,
 ) -> Array:
     """
-    Create a mask representing the
-    valid combinations of the quantum numbers
-    which can be used to flatten the harmonics.
+    Create a mask representing the valid combinations of the quantum numbers.
+
+    Can be used to flatten the harmonics.
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     n_end : int
         The maximum degree of the harmonic.
     include_negative_m : bool, optional
@@ -195,6 +203,8 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
     nodes : Iterable[TSpherical] | None, optional
         The nodes to consider, by default None
         If None, all nodes are considered.
+    xp : ArrayNamespaceFull
+        The array namespace.
 
     Returns
     -------
@@ -202,7 +212,7 @@ def flatten_mask_harmonics[TSpherical, TEuclidean](
         The mask.
 
     """
-    index_arrays = _index_array_harmonics_all(
+    index_arrays: Mapping[TSpherical, Array] = _index_array_harmonics_all(
         c,
         n_end=n_end,
         include_negative_m=include_negative_m,
@@ -247,8 +257,19 @@ def flatten_harmonics[TSpherical, TEuclidean](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     harmonics : Array
         The (unflattend) harmonics.
+    n_end : int | None, optional
+        The maximum degree of the harmonic, by default None
+        If None, assume from the shape of harmonics.
+    include_negative_m : bool | None, optional
+        Whether to include negative m values, by default None
+        If None, assume from the shape of harmonics.
+    axis_end : int, optional
+        The axis to flatten, by default -1
+        Must be negative.
 
     Returns
     -------
@@ -284,6 +305,8 @@ def unflatten_harmonics[TSpherical, TEuclidean](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     harmonics : Array
         The flattened harmonics.
     include_negative_m : bool, optional
@@ -320,11 +343,12 @@ def index_array_harmonics[TSpherical, TEuclidean](
     flatten: bool = False,
 ) -> Array:
     """
-    The index of the eigenfunction
-    corresponding to the node.
+    The index of the eigenfunction corresponding to the node.
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     node : TSpherical
         The node of the spherical coordinates.
     n_end : int
@@ -336,6 +360,8 @@ def index_array_harmonics[TSpherical, TEuclidean](
         If None, True iff concat is True.
     flatten : bool, optional
         Whether to flatten the result, by default False
+    xp : ArrayNamespaceFull
+        The array namespace.
 
     Returns
     -------
@@ -398,11 +424,12 @@ def index_array_harmonics_all[TSpherical, TEuclidean](
     flatten: bool | None = None,
 ) -> Array | Mapping[TSpherical, Array]:
     """
-    The all indices of the eigenfunction
-    corresponding to the spherical coordinates.
+    The all indices of the eigenfunction corresponding to the spherical coordinates.
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     n_end : int
         The maximum degree of the harmonic.
     include_negative_m : bool, optional
@@ -418,6 +445,8 @@ def index_array_harmonics_all[TSpherical, TEuclidean](
     flatten : bool, optional
         Whether to flatten the result, by default None
         If None, True iff as_array is True.
+    xp : ArrayNamespaceFull
+        The array namespace.
 
     Returns
     -------
@@ -446,7 +475,7 @@ def index_array_harmonics_all[TSpherical, TEuclidean](
         flatten = as_array
     if flatten and not expand_dims:
         raise ValueError("expand_dims must be True if flatten is True.")
-    index_arrays = _index_array_harmonics_all(
+    index_arrays = _index_array_harmonics_all(  # type: ignore[call-overload]
         c,
         n_end=n_end,
         xp=xp,
@@ -461,5 +490,5 @@ def index_array_harmonics_all[TSpherical, TEuclidean](
         return {
             node: flatten_harmonics(c, index_array)
             for node, index_array in index_arrays.items()
-        }  # type: ignore
+        }
     return index_arrays

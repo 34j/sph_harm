@@ -38,6 +38,8 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     euclidean : Mapping[TEuclidean, Array]
         The translation vector in euclidean coordinates.
         Each array must have the same shape (...,).
@@ -135,6 +137,8 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     n_end_1 : int
         The maximum degree of the harmonic
         for the first harmonics.
@@ -143,6 +147,8 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
         for the second harmonics.
     condon_shortley_phase : bool
         Whether to apply the Condon-Shortley phase.
+    xp : ArrayNamespaceFull
+        The array namespace.
     conj_1 : bool
         Whether to conjugate the first harmonics.
         by default False
@@ -201,7 +207,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
         return {k: Y1[k] * Y2[k] for k in c.s_nodes}
 
     # returns [user1,...,userM,n1,...,nN,np1,...,npN]
-    result = expand(
+    result: Mapping[TSpherical, Array] = expand(
         c,
         to_expand,
         does_f_support_separation_of_variables=True,
@@ -249,6 +255,8 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     spherical : Mapping[TSpherical, Array]
         The translation vector in spherical coordinates.
     n_end : int
@@ -337,6 +345,8 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     spherical : Mapping[TSpherical, Array]
         The translation vector in spherical coordinates.
     n_end : int
@@ -349,6 +359,11 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
         The wavenumber.
     is_type_same : bool
         Whether the type of the elementary solutions is same.
+    method : Literal["gumerov", "plane_wave", "triplet"] | None
+        The method to compute the translation coefficients.
+        If None, the fastest method is chosen automatically.
+        "gumerov" is only available for branching type "ba".
+        "plane_wave" is only available when `is_type_same` is True.
 
     Returns
     -------
@@ -375,7 +390,7 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
                 spherical[get_child(c.G, c.root, "sin")],
                 n_end=max(n_end, n_end_add),
                 same=is_type_same,
-            )[: n_end ** 2, : n_end_add ** 2]
+            )[: n_end**2, : n_end_add**2]
         else:
             raise NotImplementedError()
     elif method == "plane_wave":

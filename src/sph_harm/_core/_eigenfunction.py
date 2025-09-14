@@ -1,4 +1,6 @@
 r"""
+Core eigenfunctions for spherical harmonics.
+
 For all types of eigenfunctions,
 the maximum value of the absolute value of
 the quantum number of the child nodes will be
@@ -339,11 +341,12 @@ def ndim_harmonics[TSpherical, TEuclidean](
     node: TSpherical,
 ) -> int:
     """
-    The number of dimensions of the eigenfunction
-    corresponding to the node.
+    The number of dimensions of the eigenfunction corresponding to the node.
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     node : TSpherical
         The node of the spherical coordinates.
 

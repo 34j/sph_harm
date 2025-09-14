@@ -25,6 +25,8 @@ def _harmonics(
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     spherical : Mapping[TSpherical, Array]
         The spherical coordinates.
     n_end : int
@@ -154,6 +156,8 @@ def harmonics(
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     spherical : Mapping[TSpherical, Array]
         The spherical coordinates.
     n_end : int
@@ -221,7 +225,7 @@ def harmonics(
         index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
     )
     if expand_dims:
-        result = expand_dims_harmonics(c, result)  # type: ignore
+        result = expand_dims_harmonics(c, result)
     if concat:
         result = concat_harmonics(c, result)
     if flatten:

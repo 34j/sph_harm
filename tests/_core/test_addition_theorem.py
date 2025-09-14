@@ -41,7 +41,7 @@ def test_addition_theorem_same_x[TSpherical, TEuclidean](
         * xp.ones_like(x_spherical["r"])[:, None]
     )
     x_Y = harmonics(
-        c,  # type: ignore
+        c,
         x_spherical,
         n_end=n_end,
         condon_shortley_phase=False,
@@ -123,7 +123,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
         raise ValueError("type must be 'legendre' or 'gegenbauer")
 
     x_Y = harmonics(
-        c,  # type: ignore
+        c,
         x_spherical,
         n_end=n_end,
         condon_shortley_phase=False,
@@ -132,7 +132,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
         flatten=False,
     )
     y_Y = harmonics(
-        c,  # type: ignore
+        c,
         y_spherical,
         n_end=n_end,
         condon_shortley_phase=False,

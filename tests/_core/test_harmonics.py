@@ -64,7 +64,7 @@ def test_match_scipy(n_end: int, xp: ArrayNamespaceFull) -> None:
     )
     actual = harmonics(
         c,
-        x_spherical,  # type: ignore
+        x_spherical,
         n_end=n_end,
         condon_shortley_phase=True,
         concat=True,

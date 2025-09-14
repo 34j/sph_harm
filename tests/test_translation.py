@@ -8,7 +8,6 @@ from ultrasphere import (
     c_spherical,
     from_branching_types,
 )
-from ultrasphere import random_ball as random_points
 
 from sph_harm._core._flatten import unflatten_harmonics
 from sph_harm._helmholtz import (
@@ -85,8 +84,8 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
         (c_spherical()),
     ],
 )
-@pytest.mark.parametrize("n_end, n_end_add", [(4, 4)])
-@pytest.mark.parametrize("condon_shortley_phase", [False])
+@pytest.mark.parametrize("n_end, n_end_add", [(4, 6)])
+@pytest.mark.parametrize("condon_shortley_phase", [False, True])
 @pytest.mark.parametrize(
     "from_,to_",
     [("regular", "regular"), ("singular", "singular"), ("regular", "singular")],
@@ -109,23 +108,26 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         pytest.skip("gumerov method only supports ba branching type")
     if method == "plane_wave" and from_ != to_:
         pytest.skip("plane_wave method only supports from_=to_")
-    shape = ()
+
     # get x, t, y := x + t
-    x = random_points(c, shape=shape, xp=xp)
-    t = random_points(c, shape=shape, xp=xp)
-    k = xp.random.random_uniform(low=0.8, high=1.2, shape=shape)
+    x = xp.arange(c.e_ndim)
+    t = xp.flip(xp.arange(c.e_ndim))
+    k = 1.0
     if (from_, to_) == ("singular", "singular"):
         # |t| < |x| (if too close, the result would be inaccurate)
-        t = t * xp.random.random_uniform(low=0.05, high=0.1, shape=shape)
+        t = t * 0.1
         assert (
             xp.linalg.vector_norm(t, axis=0) < xp.linalg.vector_norm(x, axis=0)
         ).all()
     elif (from_, to_) == ("regular", "singular"):
         # |t| > |x| (if too close, the result would be inaccurate)
-        t = t * xp.random.random_uniform(low=10, high=20, shape=shape)
+        t = t * 10
         assert (
             xp.linalg.vector_norm(t, axis=0) > xp.linalg.vector_norm(x, axis=0)
         ).all()
+    elif (from_, to_) == ("regular", "regular"):
+        # accurate everywhere
+        pass
 
     # t = xp.zeros_like(t)
     y = x + t
@@ -165,6 +167,7 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         k=k,
         condon_shortley_phase=condon_shortley_phase,
         is_type_same=from_ == to_,
+        method=method,
     )
     # cannot be replaced with vecdot because both is complex
     actual = xp.sum(

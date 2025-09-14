@@ -14,6 +14,8 @@ def concat_harmonics[TSpherical, TEuclidean](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     harmonics : Mapping[TSpherical, Array]
         The expanded harmonics.
 

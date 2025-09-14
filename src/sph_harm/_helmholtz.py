@@ -44,7 +44,7 @@ def harmonics_regular_singular_component[TEuclidean, TSpherical](
 ) -> Array: ...
 
 
-def harmonics_regular_singular_component[TEuclidean, TSpherical](
+def harmonics_regular_singular_component[TEuclidean, TSpherical](  # type: ignore[misc]
     c: SphericalCoordinates[TSpherical, TEuclidean],
     spherical: (
         Mapping[TSpherical | Literal["r"], Array] | Mapping[Literal["r"], Array]
@@ -64,6 +64,8 @@ def harmonics_regular_singular_component[TEuclidean, TSpherical](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     spherical : Mapping[TSpherical | Literal['r'],
         Array] | Mapping[Literal['r'],
         Array]
@@ -193,6 +195,8 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     spherical : Mapping[TSpherical | Literal['r'],
         Array] | Mapping[Literal['r'],
         Array]
@@ -248,7 +252,7 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
         If the wavenumber is not positive.
 
     """
-    return harmonics(
+    return harmonics(  # type: ignore[call-overload]
         c,
         spherical,
         n_end=n_end,
@@ -258,7 +262,7 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
         expand_dims=expand_dims,
         flatten=flatten,
         concat=concat,
-    ) * harmonics_regular_singular_component(
+    ) * harmonics_regular_singular_component(  # type: ignore[call-overload]
         c,
         spherical,
         n_end=n_end,

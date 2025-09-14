@@ -68,7 +68,7 @@ $$
 Y^l(\theta) = \prod_{\Theta \in \text{Nodes}} \psi^l_\Theta (\theta_{\Theta})
 $$
 
-Each $\psi^l_\Theta$ only depends to 1,2 or 3 quantum number depnding on the type of $\Theta$.
+Each $\psi^l_\Theta$ only depends to 1,2 or 3 quantum number depending on the type of $\Theta$.
 
 To compute $Y$, this package do the following:
 

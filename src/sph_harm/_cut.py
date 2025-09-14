@@ -33,6 +33,8 @@ def expand_cut[TEuclidean, TSpherical](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     expansion : Mapping[TSpherical, Array] | Array
         The expansion coefficients.
         If mapping, assume that the expansion is not expanded.
@@ -45,8 +47,7 @@ def expand_cut[TEuclidean, TSpherical](
         The cut expansion coefficients.
 
     """
-    is_mapping = isinstance(expansion, Mapping)
-    if is_mapping:
+    if isinstance(expansion, Mapping):
         return {
             k: v[..., : int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim))]
             for k, v in expansion.items()

@@ -26,6 +26,8 @@ def _expand_dim_harmoncis[TSpherical, TEuclidean](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     node : TSpherical
         The node of the spherical coordinates.
     harmonics : Array
@@ -90,6 +92,8 @@ def expand_dims_harmonics[TSpherical, TEuclidean](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     harmonics : Mapping[TSpherical, Array]
         The dictionary of harmonics (eigenfunctions).
 

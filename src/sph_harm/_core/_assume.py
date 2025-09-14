@@ -18,9 +18,13 @@ def assume_n_end_and_include_negative_m_from_harmonics[TEuclidean, TSpherical](
 
     Parameters
     ----------
+    c : SphericalCoordinates[TSpherical, TEuclidean]
+        The spherical coordinates.
     expansion : Mapping[TSpherical, Array] | Array | tuple[int, ...]
         The expansion coefficients.
         If mapping, assume that the expansion is not expanded.
+    flatten : bool, optional
+        Whether the expansion is flattened.
 
     Returns
     -------
@@ -28,9 +32,10 @@ def assume_n_end_and_include_negative_m_from_harmonics[TEuclidean, TSpherical](
         n_end, include_negative_m
 
     """
-    is_mapping = isinstance(expansion, Mapping)
     if flatten:
-        if is_mapping:
+        if isinstance(expansion, Mapping):
+            raise NotImplementedError()
+        if isinstance(expansion, tuple):
             raise NotImplementedError()
         size = expansion.shape[-1]
         n_end = 0
@@ -40,18 +45,19 @@ def assume_n_end_and_include_negative_m_from_harmonics[TEuclidean, TSpherical](
                 return n_end, False
             elif size_current > size:
                 raise ValueError(
-                    f"The size of the last axis {size=} does not correspond to any n_end."
+                    f"The size of the last axis {size=} "
+                    "does not correspond to any n_end."
                 )
             n_end += 1
     else:
         if c.s_ndim == 0:
             return 0, False
-        if is_mapping:
-            sizes = [expansion[k].shape[-1] for k in c.s_nodes]
+        if isinstance(expansion, Mapping):
+            sizes = tuple([expansion[k].shape[-1] for k in c.s_nodes])
         elif isinstance(expansion, tuple):
             sizes = expansion[-c.s_ndim :]
         else:
-            sizes = expansion.shape[-c.s_ndim :]  # type: ignore
+            sizes = expansion.shape[-c.s_ndim :]
         n_end = (max(sizes) + 1) // 2
         include_negative_m = not all(size == n_end for size in sizes)
         return n_end, include_negative_m

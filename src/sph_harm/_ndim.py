@@ -11,7 +11,7 @@ def homogeneous_ndim_eq(n: int | Array, *, e_ndim: int | Array) -> int | Array:
 
     Parameters
     ----------
-    n_end : int | Array
+    n : int | Array
         The degree.
     e_ndim : int | Array
         The dimension of the Euclidean space.
@@ -27,6 +27,7 @@ def homogeneous_ndim_eq(n: int | Array, *, e_ndim: int | Array) -> int | Array:
     Boundary Integral Equations. p.250 (8.7)
 
     """
+    s_ndim = e_ndim - 1
     result = binom(n + s_ndim, s_ndim)
     xp = array_namespace(result)
     return xp.astype(xp.round(result), int)
@@ -77,7 +78,7 @@ def harm_n_ndim_eq(n: int | Array, *, e_ndim: int | Array) -> int | Array:
 
     Parameters
     ----------
-    n_end : int | Array
+    n : int | Array
         The degree.
     e_ndim : int | Array
         The dimension of the Euclidean space.

@@ -1,6 +1,8 @@
+from collections.abc import Mapping
+
 import array_api_extra as xpx
 import pytest
-from array_api._2024_12 import ArrayNamespaceFull
+from array_api._2024_12 import Array, ArrayNamespaceFull
 from ultrasphere import SphericalCoordinates, c_spherical, hopf, random
 from ultrasphere._integral import roots
 
@@ -28,7 +30,7 @@ def test_index_array_harmonics_all[TEuclidean, TSpherical](
     iall_concat = _index_array_harmonics_all(
         c, n_end=n_end, include_negative_m=False, expand_dims=True, as_array=True, xp=xp
     )
-    iall = _index_array_harmonics_all(
+    iall: Mapping[TSpherical, Array] = _index_array_harmonics_all(
         c,
         n_end=n_end,
         include_negative_m=False,

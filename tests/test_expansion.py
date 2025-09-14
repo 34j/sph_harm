@@ -46,7 +46,7 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
     xp: ArrayNamespaceFull,
 ) -> None:
     def f(spherical: Mapping[TSpherical, Array]) -> Array:
-        return harmonics(
+        return harmonics(  # type: ignore[call-overload]
             c,
             spherical,
             n_end=n_end,
@@ -55,7 +55,7 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
             expand_dims=concat,
         )
 
-    actual = expand(
+    actual = expand(  # type: ignore[call-overload]
         c,
         f,
         n=2 * n_end - 1,
