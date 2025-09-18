@@ -218,6 +218,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
     )
     result = expand_dims_harmonics(c, result)
     result = concat_harmonics(c, result)
+    result = xp.real(result)
     result = flatten_harmonics(c, result)
     result = flatten_harmonics(
         c,
@@ -305,18 +306,17 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
         type="regular" if is_type_same else "singular",
         flatten=True,
     )
+    expansion = harmonics_twins_expansion(
+        c,
+        n_end_1=n_end,
+        n_end_2=n_end_add,
+        condon_shortley_phase=condon_shortley_phase,
+        conj_1=False,
+        conj_2=True,
+        xp=xp,
+    )
     return coef * xp.sum(
-        (-1j) ** (n - ns - ntemp)
-        * t_RS[..., None, None, :]
-        * harmonics_twins_expansion(
-            c,
-            n_end_1=n_end,
-            n_end_2=n_end_add,
-            condon_shortley_phase=condon_shortley_phase,
-            conj_1=False,
-            conj_2=True,
-            xp=xp,
-        ),
+        (-1j) ** (n - ns - ntemp) * t_RS[..., None, None, :] * expansion,
         axis=-1,
     )
 
