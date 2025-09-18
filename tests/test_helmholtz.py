@@ -6,6 +6,7 @@ from array_api_compat import to_device
 from scipy.special import sph_harm_y_all, spherical_jn
 from ultrasphere import c_spherical
 
+from sph_harm._core._eigenfunction import Phase
 from sph_harm._core._flatten import flatten_harmonics
 from sph_harm._helmholtz import harmonics_regular_singular
 
@@ -35,7 +36,7 @@ def test_match_scipy(n_end: int, xp: ArrayNamespaceFull, k: Array) -> None:
         c,
         x_spherical,
         n_end=n_end,
-        condon_shortley_phase=True,
+        phase=Phase.NEGATIVE_LEGENDRE,
         concat=True,
         expand_dims=True,
         flatten=True,

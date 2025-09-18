@@ -6,6 +6,8 @@ from array_api_compat import array_namespace
 from gumerov_expansion_coefficients import translational_coefficients
 from ultrasphere import SphericalCoordinates, get_child
 
+from sph_harm._core._eigenfunction import Phase
+
 from ._core import concat_harmonics, expand_dims_harmonics
 from ._core._flatten import (
     flatten_harmonics,
@@ -24,7 +26,7 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
     *,
     n_end: int,
     n_end_add: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     k: Array,
 ) -> Array:
     r"""
@@ -47,8 +49,9 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
         The maximum degree of the harmonic.
     n_end_add : int
         The maximum degree of the harmonic to be summed over.
-    condon_shortley_phase : bool
-        Whether to apply the Condon-Shortley phase.
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
     k : Array
         The wavenumber.
 
@@ -77,7 +80,7 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
             c,
             spherical,
             n_end=n_end,
-            condon_shortley_phase=condon_shortley_phase,
+            phase=phase,
             expand_dims=True,
             concat=True,
             flatten=True,
@@ -115,7 +118,7 @@ def _harmonics_translation_coef_plane_wave[TEuclidean, TSpherical](
         does_f_support_separation_of_variables=False,
         n=n_end + n_end_add - 1,
         n_end=n_end_add,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         xp=xp,
     )
 
@@ -125,7 +128,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
     *,
     n_end_1: int,
     n_end_2: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     xp: ArrayNamespaceFull,
     conj_1: bool = False,
     conj_2: bool = False,
@@ -145,8 +148,9 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
     n_end_2 : int
         The maximum degree of the harmonic
         for the second harmonics.
-    condon_shortley_phase : bool
-        Whether to apply the Condon-Shortley phase.
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
     xp : ArrayNamespaceFull
         The array namespace.
     conj_1 : bool
@@ -183,7 +187,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
             c,
             spherical,
             n_end=n_end_1,
-            condon_shortley_phase=condon_shortley_phase,
+            phase=phase,
             expand_dims=True,
             concat=False,
         )
@@ -194,7 +198,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
             c,
             spherical,
             n_end=n_end_2,
-            condon_shortley_phase=condon_shortley_phase,
+            phase=phase,
             expand_dims=True,
             concat=False,
         )
@@ -213,7 +217,7 @@ def harmonics_twins_expansion[TEuclidean, TSpherical](
         does_f_support_separation_of_variables=True,
         n=n_end_1 + n_end_2 - 1,  # at least n_end + 2
         n_end=n_end_1 + n_end_2 - 1,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         xp=xp,
     )
     result = expand_dims_harmonics(c, result)
@@ -239,7 +243,7 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
     *,
     n_end: int,
     n_end_add: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     k: Array,
     is_type_same: bool,
 ) -> Array:
@@ -264,8 +268,9 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
         The maximum degree of the harmonic.
     n_end_add : int
         The maximum degree of the harmonic to be summed over.
-    condon_shortley_phase : bool
-        Whether to apply the Condon-Shortley phase.
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
     k : Array
         The wavenumber.
     is_type_same : bool
@@ -299,7 +304,7 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
         c,
         spherical,
         n_end=n_end + n_end_add - 1,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         expand_dims=True,
         concat=True,
         k=k,
@@ -310,7 +315,7 @@ def _harmonics_translation_coef_triplet[TEuclidean, TSpherical](
         c,
         n_end_1=n_end,
         n_end_2=n_end_add,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         conj_1=False,
         conj_2=True,
         xp=xp,
@@ -327,7 +332,7 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
     *,
     n_end: int,
     n_end_add: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     k: Array,
     is_type_same: bool,
     method: Literal["gumerov", "plane_wave", "triplet"] | None = None,
@@ -353,8 +358,9 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
         The maximum degree of the harmonic.
     n_end_add : int
         The maximum degree of the harmonic to be summed over.
-    condon_shortley_phase : bool
-        Whether to apply the Condon-Shortley phase.
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
     k : Array
         The wavenumber.
     is_type_same : bool
@@ -403,7 +409,7 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
             euclidean=c.to_euclidean(spherical, as_array=True),
             n_end=n_end,
             n_end_add=n_end_add,
-            condon_shortley_phase=condon_shortley_phase,
+            phase=phase,
             k=k,
         )
     elif method == "triplet":
@@ -412,7 +418,7 @@ def harmonics_translation_coef[TEuclidean, TSpherical](
             spherical,
             n_end=n_end,
             n_end_add=n_end_add,
-            condon_shortley_phase=condon_shortley_phase,
+            phase=phase,
             k=k,
             is_type_same=is_type_same,
         )

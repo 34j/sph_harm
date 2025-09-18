@@ -10,6 +10,7 @@ from ultrasphere import (
 )
 
 from ._core import assume_n_end_and_include_negative_m_from_harmonics, harmonics
+from ._core._eigenfunction import Phase
 from ._core._eigenfunction import ndim_harmonics as ndim_harmonics_
 
 
@@ -28,7 +29,7 @@ def expand[TEuclidean, TSpherical](
     n_end: int,
     n: int,
     *,
-    condon_shortley_phase: bool,
+    phase: Phase,
     xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
@@ -50,7 +51,7 @@ def expand[TEuclidean, TSpherical](
     n_end: int,
     n: int,
     *,
-    condon_shortley_phase: bool,
+    phase: Phase,
     xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
@@ -71,7 +72,7 @@ def expand[TEuclidean, TSpherical](
     n_end: int,
     n: int,
     *,
-    condon_shortley_phase: bool,
+    phase: Phase,
     xp: ArrayNamespaceFull,
     device: Any | None = None,
     dtype: Any | None = None,
@@ -110,7 +111,7 @@ def expand[TEuclidean, TSpherical](
         >>>     does_f_support_separation_of_variables=False,
         >>>     n=n,
         >>>     n_end=n,
-        >>>     condon_shortley_phase=False
+        >>>     phase=False
         >>> )
         >>> print(np.round(expansion, 2).real.tolist())
         [1.0, 0.0, 0.0, 0.0, 0.0, -0.0, -0.0, -0.0, -0.0]
@@ -118,19 +119,9 @@ def expand[TEuclidean, TSpherical](
         This result claims that f(θ) = 1, which is incorrect.
     n_end : int
         The maximum degree of the harmonic.
-    condon_shortley_phase : bool
-        Whether to apply the Condon-Shortley phase,
-        which just multiplies the result by (-1)^m.
-
-        It seems to be mainly used in quantum mechanics for convenience.
-
-        Note that scipy.special.sph_harm (or scipy.special.lpmv)
-        uses the Condon-Shortley phase.
-
-        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
-
-        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
-        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
     xp : ArrayNamespaceFull
         The array namespace.
     device : Any, optional
@@ -173,7 +164,7 @@ def expand[TEuclidean, TSpherical](
             c,
             xs,
             n_end=n_end,
-            condon_shortley_phase=condon_shortley_phase,
+            phase=phase,
             expand_dims=not does_f_support_separation_of_variables,
             concat=not does_f_support_separation_of_variables,
         )
@@ -236,7 +227,7 @@ def expand_evaluate[TEuclidean, TSpherical](
     expansion: Mapping[TSpherical, Array],
     spherical: Mapping[TSpherical, Array],
     *,
-    condon_shortley_phase: bool,
+    phase: Phase,
 ) -> Mapping[TSpherical, Array]: ...
 
 
@@ -246,7 +237,7 @@ def expand_evaluate[TEuclidean, TSpherical](
     expansion: Array,
     spherical: Mapping[TSpherical, Array],
     *,
-    condon_shortley_phase: bool,
+    phase: Phase,
 ) -> Array: ...
 
 
@@ -255,7 +246,7 @@ def expand_evaluate[TEuclidean, TSpherical](
     expansion: Mapping[TSpherical, Array] | Array,
     spherical: Mapping[TSpherical, Array],
     *,
-    condon_shortley_phase: bool,
+    phase: Phase,
 ) -> Array | Mapping[TSpherical, Array]:
     """
     Evaluate the expansion at the spherical coordinates.
@@ -273,19 +264,9 @@ def expand_evaluate[TEuclidean, TSpherical](
         If mapping, assume that the expansion is not expanded.
     spherical : Mapping[TSpherical, Array]
         The spherical coordinates.
-    condon_shortley_phase : bool
-        Whether to apply the Condon-Shortley phase,
-        which just multiplies the result by (-1)^m.
-
-        It seems to be mainly used in quantum mechanics for convenience.
-
-        Note that scipy.special.sph_harm (or scipy.special.lpmv)
-        uses the Condon-Shortley phase.
-
-        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
-
-        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
-        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
 
 
     Returns
@@ -305,7 +286,7 @@ def expand_evaluate[TEuclidean, TSpherical](
         c,
         spherical,
         n_end=n_end,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         expand_dims=not is_mapping,
         concat=not is_mapping,
         flatten=not is_mapping,

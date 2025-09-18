@@ -20,6 +20,8 @@ Reference
 DOI:10.3842/SIGMA.2013.042 p.17-18
 """
 
+from enum import STRICT, Flag, auto
+
 from array_api._2024_12 import Array
 from array_api_compat import array_namespace
 from array_api_negative_index import to_symmetric
@@ -28,11 +30,38 @@ from shift_nth_row_n_steps import shift_nth_row_n_steps
 from ultrasphere import BranchingType, SphericalCoordinates
 
 
+class Phase(Flag, boundary=STRICT):
+    """Adjust phase (±) of the spherical harmonics, mainly to match conventions."""
+
+    CSPHASE = auto()
+    """Whether to apply the Condon-Shortley phase.
+
+    It just multiplies the result by $(-1)^m$.
+
+    By using this phase, in quantum mechanics,
+    spherical harmonics with ladder operator applied
+    become spherical harmonics times always positive real numbers.
+
+    scipy.special.sph_harm_y uses the Condon-Shortley phase."""
+
+    NEGATIVE_LEGENDRE = auto()
+    r"""Whether to use $P_l^m$ or $P_l^{|m|}$ for negative m.
+
+    If False, $Y^{-m}_{l} = \overline{Y^{m}_{l}}$.
+    If True, $Y^{-m}_{l} = (-1)^m \overline{Y^{m}_{l}}$.
+
+    scipy.special.sph_harm_y uses P_l^m."""
+
+
+def minus_1_power(x: Array, /) -> Array:
+    return 1 - 2 * (x % 2)
+
+
 def type_a(
     theta: Array,
     n_end: int,
     *,
-    condon_shortley_phase: bool,
+    phase: Phase,
     include_negative_m: bool = True,
 ) -> Array:
     """
@@ -44,16 +73,9 @@ def type_a(
         [0, 2π)
     n_end : int
         The maximum degree of the harmonic.
-    condon_shortley_phase : bool, optional
-        Whether to apply the Condon-Shortley phase,
-        which just multiplies the result by (-1)^m.
-
-        It seems to be mainly used in quantum mechanics for convenience.
-
-        scipy.special.sph_harm (or scipy.special.lpmv) uses the Condon-Shortley phase.
-
-        If False, `Y^{-m}_{l} = Y^{m}_{l}*`. If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
-        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
     include_negative_m : bool, optional
         Whether to include negative m values, by default True
         If True, the m values are [0, 1, ..., n_end-1, -n_end+1, ..., -1],
@@ -85,8 +107,14 @@ def type_a(
         * m
         * theta[..., None]
     ) / xp.sqrt(xp.asarray(2 * xp.pi))
-    if condon_shortley_phase:
-        res *= (-1) ** ((m + xp.abs(m)) // 2)
+    if Phase.CSPHASE in phase:
+        if Phase.NEGATIVE_LEGENDRE in phase:
+            res *= minus_1_power((xp.abs(m) + m) // 2)
+        else:
+            res *= minus_1_power(m)
+    else:
+        if Phase.NEGATIVE_LEGENDRE in phase:
+            res *= minus_1_power((xp.abs(m) - m) // 2)
     return res
 
 

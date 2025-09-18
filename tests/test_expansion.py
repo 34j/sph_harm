@@ -16,7 +16,7 @@ from ultrasphere import (
     standard,
 )
 
-from sph_harm._core import harmonics
+from sph_harm._core import Phase, harmonics
 from sph_harm._core._eigenfunction import ndim_harmonics
 from sph_harm._cut import expand_cut
 from sph_harm._expansion import expand, expand_evaluate
@@ -36,12 +36,12 @@ Path.mkdir(PATH, exist_ok=True)
     ],
 )
 @pytest.mark.parametrize("n_end", [3, 4])
-@pytest.mark.parametrize("condon_shortley_phase", [True, False])
+@pytest.mark.parametrize("phase", [True, False])
 @pytest.mark.parametrize("concat", [True, False])
 def test_orthogonal_expand[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     concat: bool,
     xp: ArrayNamespaceFull,
 ) -> None:
@@ -50,7 +50,7 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
             c,
             spherical,
             n_end=n_end,
-            condon_shortley_phase=condon_shortley_phase,
+            phase=phase,
             concat=concat,
             expand_dims=concat,
         )
@@ -61,7 +61,7 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
         n=2 * n_end - 1,
         n_end=n_end,
         does_f_support_separation_of_variables=not concat,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         xp=xp,
         dtype=xp.float32,
         device=None,
@@ -103,12 +103,12 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
         # ("random-10", random(6), 5),
     ],
 )
-@pytest.mark.parametrize("condon_shortley_phase", [True, False])
+@pytest.mark.parametrize("phase", [True, False])
 def test_approximate[TSpherical, TEuclidean](
     name: str,
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     xp: ArrayNamespaceFull,
 ) -> None:
     k = xp.arange(c.e_ndim) / c.e_ndim
@@ -134,7 +134,7 @@ def test_approximate[TSpherical, TEuclidean](
         n=n_end,
         n_end=n_end,
         does_f_support_separation_of_variables=False,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         xp=xp,
     )
     for n_end_c in np.linspace(1, n_end, 5):
@@ -144,7 +144,7 @@ def test_approximate[TSpherical, TEuclidean](
             c,
             expansion_cut,
             spherical,
-            condon_shortley_phase=condon_shortley_phase,
+            phase=phase,
         )
         error[n_end_c] = xp.mean(xp.abs(approx - expected))
     fig, ax = plt.subplots()

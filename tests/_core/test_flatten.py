@@ -7,6 +7,7 @@ from ultrasphere import SphericalCoordinates, c_spherical, hopf, random
 from ultrasphere._integral import roots
 
 from sph_harm._core import harmonics as harmonics_
+from sph_harm._core._eigenfunction import Phase
 from sph_harm._core._flatten import (
     _index_array_harmonics_all,
     flatten_harmonics,
@@ -64,7 +65,7 @@ def test_flatten_unflatten_harmonics[TSpherical, TEuclidean](
         c,
         roots(c, n=n_end, expand_dims_x=True, xp=xp)[0],
         n_end=n_end,
-        condon_shortley_phase=False,
+        phase=Phase(0),
         concat=True,
         expand_dims=True,
         flatten=False,

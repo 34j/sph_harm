@@ -8,6 +8,7 @@ from jacobi_poly import legendre_all as legendre
 from ultrasphere import SphericalCoordinates, c_spherical, standard
 
 from sph_harm._core import harmonics
+from sph_harm._core._eigenfunction import Phase
 from sph_harm._ndim import harm_n_ndim_eq
 
 
@@ -44,7 +45,7 @@ def test_addition_theorem_same_x[TSpherical, TEuclidean](
         c,
         x_spherical,
         n_end=n_end,
-        condon_shortley_phase=False,
+        phase=Phase(0),
         concat=True,
         expand_dims=True,
         flatten=False,
@@ -126,7 +127,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
         c,
         x_spherical,
         n_end=n_end,
-        condon_shortley_phase=False,
+        phase=Phase(0),
         concat=True,
         expand_dims=True,
         flatten=False,
@@ -135,7 +136,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
         c,
         y_spherical,
         n_end=n_end,
-        condon_shortley_phase=False,
+        phase=Phase(0),
         concat=True,
         expand_dims=True,
         flatten=False,

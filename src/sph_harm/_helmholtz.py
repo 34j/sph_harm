@@ -6,6 +6,8 @@ from array_api_compat import array_namespace
 from ultrasphere import SphericalCoordinates
 from ultrasphere.special import szv
 
+from sph_harm._core._eigenfunction import Phase
+
 from ._core import harmonics
 from ._core._flatten import _index_array_harmonics, flatten_harmonics
 
@@ -146,7 +148,7 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
     *,
     n_end: int,
     k: Array,
-    condon_shortley_phase: bool = False,
+    phase: Phase,
     type: Literal["regular", "singular", "j", "y", "h1", "h2"],
     derivative: bool = False,
     expand_dims: bool = True,
@@ -165,7 +167,7 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
     *,
     n_end: int,
     k: Array,
-    condon_shortley_phase: bool = False,
+    phase: Phase,
     type: Literal["regular", "singular", "j", "y", "h1", "h2"],
     derivative: bool = False,
     expand_dims: bool = True,
@@ -183,7 +185,7 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
     *,
     n_end: int,
     k: Array,
-    condon_shortley_phase: bool = False,
+    phase: Phase,
     type: Literal["regular", "singular", "j", "y", "h1", "h2"],
     derivative: bool = False,
     expand_dims: bool = True,
@@ -205,19 +207,9 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
         The maximum degree of the harmonic.
     k : Array
         The wavenumber. Must be positive.
-    condon_shortley_phase : bool, optional
-        Whether to apply the Condon-Shortley phase,
-        which just multiplies the result by (-1)^m.
-
-        It seems to be mainly used in quantum mechanics for convenience.
-
-        Note that scipy.special.sph_harm (or scipy.special.lpmv)
-        uses the Condon-Shortley phase.
-
-        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
-
-        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
-        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
     type : Literal['regular', 'singular', 'j', 'y', 'h1', 'h2']
         The type of the spherical Bessel/Hankel function.
     derivative : bool, optional
@@ -256,7 +248,7 @@ def harmonics_regular_singular[TEuclidean, TSpherical](
         c,
         spherical,
         n_end=n_end,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         include_negative_m=True,
         index_with_surrogate_quantum_number=False,
         expand_dims=expand_dims,

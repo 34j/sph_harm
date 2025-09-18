@@ -10,6 +10,7 @@ from ultrasphere import (
     from_branching_types,
 )
 
+from sph_harm._core import Phase
 from sph_harm._core._flatten import unflatten_harmonics
 from sph_harm._helmholtz import (
     harmonics_regular_singular,
@@ -40,7 +41,7 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
             y_spherical,
             k=k,
             n_end=n_end,
-            condon_shortley_phase=False,
+            phase=Phase(0),
             concat=True,
             expand_dims=True,
             type="singular",
@@ -50,7 +51,7 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
             x_spherical,
             k=k,
             n_end=n_end_add,
-            condon_shortley_phase=False,
+            phase=Phase(0),
             concat=True,
             expand_dims=True,
             type="regular",
@@ -65,7 +66,7 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
             n_end=n_end,
             n_end_add=n_end_add,
             k=k,
-            condon_shortley_phase=False,
+            phase=Phase(0),
             is_type_same=False,
             method="triplet",
         )
@@ -86,7 +87,7 @@ def test_harmonics_translation_coef_gumerov_table(xp: ArrayNamespaceFull) -> Non
     ],
 )
 @pytest.mark.parametrize("n_end, n_end_add", [(4, 6)])
-@pytest.mark.parametrize("condon_shortley_phase", [False, True])
+@pytest.mark.parametrize("phase", [False, True])
 @pytest.mark.parametrize(
     "from_,to_",
     [("regular", "regular"), ("singular", "singular"), ("regular", "singular")],
@@ -99,7 +100,7 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     n_end_add: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     from_: Literal["regular", "singular"],
     to_: Literal["regular", "singular"],
     xp: ArrayNamespaceFull,
@@ -141,7 +142,7 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         y_spherical,
         k=k,
         n_end=n_end,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         concat=True,
         expand_dims=True,
         type=to_,
@@ -151,7 +152,7 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         x_spherical,
         k=k,
         n_end=n_end_add,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         concat=True,
         expand_dims=True,
         type=from_,
@@ -166,7 +167,7 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
         n_end=n_end,
         n_end_add=n_end_add,
         k=k,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         is_type_same=from_ == to_,
         method=method,
     )
@@ -187,20 +188,20 @@ def test_dataset_coef() -> None:
     c = c_spherical()
     spherical = c.from_euclidean(euclidean)
     Path("tests/.cache").mkdir(exist_ok=True)
-    for condon_shortley_phase in [True, False]:
+    for phase in [Phase.CSPHASE]:
         for is_same_type in [True, False]:
             coef = harmonics_translation_coef(
                 c,
                 spherical,
                 n_end=3,
                 n_end_add=3,
-                condon_shortley_phase=condon_shortley_phase,
+                phase=phase,
                 is_type_same=is_same_type,
                 method="triplet",
                 k=1.0,
             )
             np.savetxt(
-                f"tests/.cache/translation_coef_{is_same_type}_phase_{condon_shortley_phase}.csv",
+                f"tests/.cache/translation_coef_{is_same_type}_phase_{phase}.csv",
                 coef,
                 delimiter=",",
             )
@@ -210,13 +211,13 @@ def test_dataset_coef() -> None:
                 spherical,
                 n_end=4,
                 k=1.0,
-                condon_shortley_phase=condon_shortley_phase,
+                phase=phase,
                 concat=True,
                 expand_dims=True,
                 type=type_,
             )
             np.savetxt(
-                f"tests/.cache/{type_}_phase_{condon_shortley_phase}.csv",
+                f"tests/.cache/{type_}_phase_{phase}.csv",
                 RS,
                 delimiter=",",
             )

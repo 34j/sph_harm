@@ -7,7 +7,7 @@ from array_api_compat import to_device
 from scipy.special import sph_harm_y_all
 from ultrasphere import SphericalCoordinates, c_spherical, hopf, integrate, standard
 
-from sph_harm._core import harmonics
+from sph_harm._core import Phase, harmonics
 from sph_harm._core._flatten import flatten_harmonics
 from sph_harm._ndim import harm_n_ndim_le
 
@@ -21,11 +21,11 @@ from sph_harm._ndim import harm_n_ndim_le
     ],
 )
 @pytest.mark.parametrize("n_end", [4])
-@pytest.mark.parametrize("condon_shortley_phase", [True, False])
+@pytest.mark.parametrize("phase", [True, False])
 def test_harmonics_orthogonal[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     xp: ArrayNamespaceFull,
 ) -> None:
     expected = xp.eye(int(harm_n_ndim_le(n_end, e_ndim=c.e_ndim)))
@@ -35,7 +35,7 @@ def test_harmonics_orthogonal[TSpherical, TEuclidean](
             c,
             s,
             n_end=n_end,
-            condon_shortley_phase=condon_shortley_phase,
+            phase=phase,
             concat=True,
             expand_dims=True,
         )
@@ -66,7 +66,7 @@ def test_match_scipy(n_end: int, xp: ArrayNamespaceFull) -> None:
         c,
         x_spherical,
         n_end=n_end,
-        condon_shortley_phase=True,
+        phase=Phase(0),
         concat=True,
         expand_dims=True,
         flatten=True,

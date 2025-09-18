@@ -6,7 +6,7 @@ from ultrasphere import BranchingType, SphericalCoordinates, get_child
 from ultrasphere._coordinates import TEuclidean, TSpherical
 
 from ._concat import concat_harmonics
-from ._eigenfunction import type_a, type_b, type_bdash, type_c
+from ._eigenfunction import Phase, type_a, type_b, type_bdash, type_c
 from ._expand_dim import expand_dims_harmonics
 from ._flatten import flatten_harmonics
 
@@ -16,7 +16,7 @@ def _harmonics(
     spherical: Mapping[TSpherical, Array],
     n_end: int,
     *,
-    condon_shortley_phase: bool,
+    phase: Phase,
     include_negative_m: bool = True,
     index_with_surrogate_quantum_number: bool = False,
 ) -> Mapping[TSpherical, Array] | Array:
@@ -31,19 +31,9 @@ def _harmonics(
         The spherical coordinates.
     n_end : int
         The maximum degree of the harmonic.
-    condon_shortley_phase : bool, optional
-        Whether to apply the Condon-Shortley phase,
-        which just multiplies the result by (-1)^m.
-
-        It seems to be mainly used in quantum mechanics for convenience.
-
-        Note that scipy.special.sph_harm (or scipy.special.lpmv)
-        uses the Condon-Shortley phase.
-
-        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
-
-        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
-        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
     include_negative_m : bool, optional
         Whether to include negative m values, by default True
         If True, the m values are [0, 1, ..., n_end-1, -n_end+1, ..., -1],
@@ -68,7 +58,7 @@ def _harmonics(
             result[node] = type_a(
                 value,
                 n_end=n_end,
-                condon_shortley_phase=condon_shortley_phase,
+                phase=phase,
                 include_negative_m=include_negative_m,
             )
         elif c.branching_types[node] == BranchingType.B:
@@ -113,7 +103,7 @@ def harmonics(
     /,
     *,
     n_end: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     include_negative_m: bool = True,
     index_with_surrogate_quantum_number: bool = False,
     expand_dims: bool = True,
@@ -129,7 +119,7 @@ def harmonics(
     /,
     *,
     n_end: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     include_negative_m: bool = True,
     index_with_surrogate_quantum_number: bool = False,
     expand_dims: bool = True,
@@ -144,7 +134,7 @@ def harmonics(
     /,
     *,
     n_end: int,
-    condon_shortley_phase: bool,
+    phase: Phase,
     include_negative_m: bool = True,
     index_with_surrogate_quantum_number: bool = False,
     expand_dims: bool = True,
@@ -162,19 +152,9 @@ def harmonics(
         The spherical coordinates.
     n_end : int
         The maximum degree of the harmonic.
-    condon_shortley_phase : bool, optional
-        Whether to apply the Condon-Shortley phase,
-        which just multiplies the result by (-1)^m.
-
-        It seems to be mainly used in quantum mechanics for convenience.
-
-        Note that scipy.special.sph_harm (or scipy.special.lpmv)
-        uses the Condon-Shortley phase.
-
-        If False, `Y^{-m}_{l} = Y^{m}_{l}*`.
-
-        If True, `Y^{-m}_{l} = (-1)^m Y^{m}_{l}*`.
-        (Simply because `e^{i -m phi} = (e^{i m phi})*`)
+    phase : Phase
+        Adjust phase (±) of the spherical harmonics, mainly to match conventions.
+        See `Phase` for details.
     include_negative_m : bool, optional
         Whether to include negative m values, by default True
         If True, the m values are [0, 1, ..., n_end-1, -n_end+1, ..., -1],
@@ -220,7 +200,7 @@ def harmonics(
         c,
         spherical,
         n_end,
-        condon_shortley_phase=condon_shortley_phase,
+        phase=phase,
         include_negative_m=include_negative_m,
         index_with_surrogate_quantum_number=index_with_surrogate_quantum_number,
     )
