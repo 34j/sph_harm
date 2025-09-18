@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal
 
 import array_api_extra as xpx
@@ -177,3 +178,45 @@ def test_harmonics_translation_coef[TSpherical, TEuclidean](
     if (from_, to_) == ("singular", "singular"):
         pytest.skip("singular case does not converge in real world computation")
     assert xp.all(xpx.isclose(actual, expected, rtol=1e-3, atol=1e-3))
+
+
+def test_dataset_coef() -> None:
+    import numpy as np
+
+    euclidean = np.array([2, -7, 1])
+    c = c_spherical()
+    spherical = c.from_euclidean(euclidean)
+    Path("tests/.cache").mkdir(exist_ok=True)
+    for condon_shortley_phase in [True, False]:
+        for is_same_type in [True, False]:
+            coef = harmonics_translation_coef(
+                c,
+                spherical,
+                n_end=3,
+                n_end_add=3,
+                condon_shortley_phase=condon_shortley_phase,
+                is_type_same=is_same_type,
+                method="triplet",
+                k=1.0,
+            )
+            np.savetxt(
+                f"tests/.cache/translation_coef_{is_same_type}_phase_{condon_shortley_phase}.csv",
+                coef,
+                delimiter=",",
+            )
+        for type_ in ["regular", "singular"]:
+            RS = harmonics_regular_singular(  # type: ignore[call-overload]
+                c,
+                spherical,
+                n_end=4,
+                k=1.0,
+                condon_shortley_phase=condon_shortley_phase,
+                concat=True,
+                expand_dims=True,
+                type=type_,
+            )
+            np.savetxt(
+                f"tests/.cache/{type_}_phase_{condon_shortley_phase}.csv",
+                RS,
+                delimiter=",",
+            )
