@@ -21,7 +21,7 @@ from sph_harm._ndim import harm_n_ndim_le
     ],
 )
 @pytest.mark.parametrize("n_end", [4])
-@pytest.mark.parametrize("phase", [True, False])
+@pytest.mark.parametrize("phase", Phase.all())
 def test_harmonics_orthogonal[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
@@ -66,7 +66,7 @@ def test_match_scipy(n_end: int, xp: ArrayNamespaceFull) -> None:
         c,
         x_spherical,
         n_end=n_end,
-        phase=Phase(0),
+        phase=Phase.NEGATIVE_LEGENDRE | Phase.CONDON_SHORTLEY,
         concat=True,
         expand_dims=True,
         flatten=True,

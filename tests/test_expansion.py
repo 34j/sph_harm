@@ -36,7 +36,7 @@ Path.mkdir(PATH, exist_ok=True)
     ],
 )
 @pytest.mark.parametrize("n_end", [3, 4])
-@pytest.mark.parametrize("phase", [True, False])
+@pytest.mark.parametrize("phase", Phase.all())
 @pytest.mark.parametrize("concat", [True, False])
 def test_orthogonal_expand[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
@@ -103,7 +103,7 @@ def test_orthogonal_expand[TSpherical, TEuclidean](
         # ("random-10", random(6), 5),
     ],
 )
-@pytest.mark.parametrize("phase", [True, False])
+@pytest.mark.parametrize("phase", Phase.all())
 def test_approximate[TSpherical, TEuclidean](
     name: str,
     c: SphericalCoordinates[TSpherical, TEuclidean],

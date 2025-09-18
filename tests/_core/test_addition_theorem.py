@@ -20,8 +20,12 @@ from sph_harm._ndim import harm_n_ndim_eq
     ],
 )
 @pytest.mark.parametrize("n_end", [5])
+@pytest.mark.parametrize("phase", Phase.all())
 def test_addition_theorem_same_x[TSpherical, TEuclidean](
-    c: SphericalCoordinates[TSpherical, TEuclidean], n_end: int, xp: ArrayNamespaceFull
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    n_end: int,
+    xp: ArrayNamespaceFull,
+    phase: Phase,
 ) -> None:
     """
     Test the addition theorem for spherical harmonics.
@@ -45,7 +49,7 @@ def test_addition_theorem_same_x[TSpherical, TEuclidean](
         c,
         x_spherical,
         n_end=n_end,
-        phase=Phase(0),
+        phase=phase,
         concat=True,
         expand_dims=True,
         flatten=False,
@@ -66,11 +70,13 @@ def test_addition_theorem_same_x[TSpherical, TEuclidean](
 )
 @pytest.mark.parametrize("n_end", [12])
 @pytest.mark.parametrize("type", ["legendre", "gegenbauer", "gegenbauer-cohl"])
+@pytest.mark.parametrize("phase", Phase.all())
 def test_addition_theorem[TSpherical, TEuclidean](
     c: SphericalCoordinates[TSpherical, TEuclidean],
     n_end: int,
     type: Literal["legendre", "gegenbauer", "gegenbauer-cohl"],
     xp: ArrayNamespaceFull,
+    phase: Phase,
 ) -> None:
     """
     Test the addition theorem for spherical harmonics.
@@ -127,7 +133,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
         c,
         x_spherical,
         n_end=n_end,
-        phase=Phase(0),
+        phase=phase,
         concat=True,
         expand_dims=True,
         flatten=False,
@@ -136,7 +142,7 @@ def test_addition_theorem[TSpherical, TEuclidean](
         c,
         y_spherical,
         n_end=n_end,
-        phase=Phase(0),
+        phase=phase,
         concat=True,
         expand_dims=True,
         flatten=False,

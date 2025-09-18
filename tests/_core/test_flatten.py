@@ -57,15 +57,18 @@ def test_index_array_harmonics_all[TEuclidean, TSpherical](
         hopf(2),
     ],
 )
+@pytest.mark.parametrize("phase", Phase.all())
 def test_flatten_unflatten_harmonics[TSpherical, TEuclidean](
-    c: SphericalCoordinates[TSpherical, TEuclidean], xp: ArrayNamespaceFull
+    c: SphericalCoordinates[TSpherical, TEuclidean],
+    xp: ArrayNamespaceFull,
+    phase: Phase,
 ) -> None:
     n_end = 4
     harmonics = harmonics_(
         c,
         roots(c, n=n_end, expand_dims_x=True, xp=xp)[0],
         n_end=n_end,
-        phase=Phase(0),
+        phase=phase,
         concat=True,
         expand_dims=True,
         flatten=False,

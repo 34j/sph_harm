@@ -33,7 +33,7 @@ from ultrasphere import BranchingType, SphericalCoordinates
 class Phase(Flag, boundary=STRICT):
     """Adjust phase (±) of the spherical harmonics, mainly to match conventions."""
 
-    CSPHASE = auto()
+    CONDON_SHORTLEY = auto()
     """Whether to apply the Condon-Shortley phase.
 
     It just multiplies the result by $(-1)^m$.
@@ -51,6 +51,16 @@ class Phase(Flag, boundary=STRICT):
     If True, $Y^{-m}_{l} = (-1)^m \overline{Y^{m}_{l}}$.
 
     scipy.special.sph_harm_y uses P_l^m."""
+
+    @classmethod
+    def all(cls) -> list["Phase"]:
+        """Return all possible combinations of the Phase flags."""
+        return [
+            cls(0),
+            cls.CONDON_SHORTLEY,
+            cls.NEGATIVE_LEGENDRE,
+            cls.CONDON_SHORTLEY | cls.NEGATIVE_LEGENDRE,
+        ]
 
 
 def minus_1_power(x: Array, /) -> Array:
@@ -107,7 +117,8 @@ def type_a(
         * m
         * theta[..., None]
     ) / xp.sqrt(xp.asarray(2 * xp.pi))
-    if Phase.CSPHASE in phase:
+    phase = Phase(phase)
+    if Phase.CONDON_SHORTLEY in phase:
         if Phase.NEGATIVE_LEGENDRE in phase:
             res *= minus_1_power((xp.abs(m) + m) // 2)
         else:

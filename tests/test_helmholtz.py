@@ -36,7 +36,7 @@ def test_match_scipy(n_end: int, xp: ArrayNamespaceFull, k: Array) -> None:
         c,
         x_spherical,
         n_end=n_end,
-        phase=Phase.NEGATIVE_LEGENDRE,
+        phase=Phase.NEGATIVE_LEGENDRE | Phase.CONDON_SHORTLEY,
         concat=True,
         expand_dims=True,
         flatten=True,

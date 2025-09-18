@@ -188,7 +188,7 @@ def test_dataset_coef() -> None:
     c = c_spherical()
     spherical = c.from_euclidean(euclidean)
     Path("tests/.cache").mkdir(exist_ok=True)
-    for phase in [Phase.CSPHASE]:
+    for phase in [Phase.CONDON_SHORTLEY]:
         for is_same_type in [True, False]:
             coef = harmonics_translation_coef(
                 c,
